@@ -1,10 +1,16 @@
-#1st: npm install -g typescript
+#1st: 
+npm install -g typescript
+npm install -g ts-node
 
 #2nd: which tsc
 
 #3rd: tsc --v
 
-Then run "tsc -w" to transpile code on changes
+In new projects, then do:
+
+Use `tsc --init` to initialise a tsconfig.json file.
+
+Then run `tsc -w` to transpile code on changes
 
 Default tsconfig.json:
 ---------------------------------------
