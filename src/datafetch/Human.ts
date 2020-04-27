@@ -205,7 +205,7 @@ class Human {
       await this.toggleCalendar(); //TODO: should leave the state as it was before entering
     }
     const dateRange = await this.getDateRangeTitle();
-    console.log(`[Human] expected: ${this._last28days}, found: ${dateRange}`);
+    console.log(`[Human] expected: '${this._last28days}', found: '${dateRange}'`);
     return this._last28days === dateRange;
   }
 
