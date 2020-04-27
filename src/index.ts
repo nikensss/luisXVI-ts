@@ -1,11 +1,10 @@
-import { default as fileSystem, PathLike } from 'fs';
+import { promises as fs, PathLike } from 'fs';
 import path from 'path';
 import puppeteer, { Viewport } from 'puppeteer';
 import DownloadManager from './datafetch/DownloadManager';
 import Login from './datafetch/Login';
 import AccountManager from './datafetch/AccountManager';
 import Human from './datafetch/Human';
-const fs = fileSystem.promises;
 
 const DOWNLOAD_PATH: PathLike = path.join(__dirname, 'downloads');
 const VIEWPORT: Viewport = {

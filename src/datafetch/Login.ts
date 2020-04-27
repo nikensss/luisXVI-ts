@@ -3,6 +3,9 @@ import { Page } from 'puppeteer';
 
 const result = dotenv.config();
 
+/**
+ * Performs the login operation. Keeps trying until it works.
+ */
 class Login {
   private _page: Page;
   private _user: string;
@@ -22,17 +25,17 @@ class Login {
     this._pass = process.env.pass;
   }
 
-  get user(): string {
+  public get user(): string {
     return this._user;
   }
 
-  async login(): Promise<void> {
+  public async login(): Promise<void> {
     let tries = 0;
     while (true) {
       try {
         this.log('waiting for username input');
         await this._page.waitForSelector(Login.USERNAME_INPUT_SELECTOR);
-        console.log('entering username');
+        this.log('entering username');
         await this._page.click(Login.USERNAME_INPUT_SELECTOR);
         await this._page.keyboard.type(this._user);
 
@@ -51,6 +54,7 @@ class Login {
       } catch (ex) {
         tries += 1;
         console.log('[Login] something went wrong while trying to login, trying again', ex);
+        if (tries > 30) throw new Error('Cannot log in!');
         if (tries % 5 === 0) this._page.reload();
       }
     }

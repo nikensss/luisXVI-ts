@@ -33,29 +33,36 @@ class Human {
     this._page = page;
   }
 
-  private async wait(ms: number) {
-    await new Promise((resolve) => setTimeout(() => resolve(), ms));
-  }
-
-  async tweets() {
+  /**
+   * Goes to the 'Tweets' link. One of the three options on the top-left navbar.
+   */
+  async tweets(): Promise<void> {
     console.log('[Human] I am going to /tweets!');
     await this._page.waitForXPath(Human.TWEETS_LINK);
     const tweetsLink = await this._page.$x(Human.TWEETS_LINK);
     if (tweetsLink.length > 0) {
       await tweetsLink[0].click();
+      return Promise.resolve();
     } else {
       throw new Error('[Human] Could not click on the "Tweets" link!');
     }
   }
 
-  async toggleCalendar() {
-    await this.waitAndClick({
+  /**
+   * Toggles the visibility of the calendar.
+   */
+  async toggleCalendar(): Promise<void> {
+    return await this.waitAndClick({
       name: 'calendar dropdown',
       selector: Human.CALENDAR_DROPDOWN
     });
   }
 
-  async exportDataByTweet() {
+  /**
+   * Clicks on the 'Export data' button followed by the 'By tweet' button.
+   * Will start a download.
+   */
+  async exportDataByTweet(): Promise<boolean> {
     await this.waitAndClick({
       name: 'export data',
       selector: Human.EXPORTAR_DATOS
@@ -72,20 +79,23 @@ class Human {
   }
 
   /**
-   * Clicks the 'Update' button to set the new time range
+   * Clicks the 'Update' button to set the new time range.
    */
-  async update() {
-    await this.waitAndClick({ name: 'update', selector: Human.UPDATE });
+  async update(): Promise<void> {
+    return await this.waitAndClick({ name: 'update', selector: Human.UPDATE });
   }
 
-  async selectCurrentMonth() {
+  async selectCurrentMonth(): Promise<void> {
     console.log('[Human] I am trying to find the first day of the month!');
     await this._page.waitForSelector(Human.DATE_RANGES);
     console.log('[Human] Clicking current month');
-    await this._page.$$eval(Human.DATE_RANGES, (elements) => (<HTMLElement>elements[2]).click());
+    return await this._page.$$eval(Human.DATE_RANGES, (elements) => (<HTMLElement>elements[2]).click());
   }
 
-  async downloadCurrentMonth() {
+  /**
+   * Downloads the data of the current month.
+   */
+  async downloadCurrentMonth(): Promise<boolean> {
     while (true) {
       await this.toggleCalendar();
       await this.selectCurrentMonth();
@@ -94,11 +104,11 @@ class Human {
         await this._page.reload();
         continue;
       }
-      break;
+      return Promise.resolve(true);
     }
   }
 
-  async downloadPreviousMonths(amount: number) {
+  async downloadPreviousMonths(amount: number): Promise<string[]> {
     let problematicPeriods = [];
     let range;
     for (let i = 0; i <= amount; i++) {
@@ -120,6 +130,12 @@ class Human {
       }
     }
     return problematicPeriods;
+  }
+
+  //Private methods
+
+  private async wait(ms: number): Promise<void> {
+    return await new Promise((resolve) => setTimeout(() => resolve(), ms));
   }
 
   private async leftCalendarToPreviousMonth() {
@@ -203,7 +219,7 @@ class Human {
     return files.length;
   }
 
-  private async waitForNewDownload() {
+  private async waitForNewDownload(): Promise<boolean> {
     console.log('[Human] waiting for new downloads');
     const startTime = new Date();
     let now = new Date();
@@ -214,14 +230,14 @@ class Human {
       now = new Date();
       if (now.getTime() - startTime.getTime() > Human.MAX_PATIENCE) {
         console.log(`[Human] I've waited for ${(now.getTime() - startTime.getTime()) / 1000} seconds, I am tired!`);
-        return false;
+        return Promise.resolve(false);
       }
     }
     console.log('[Human] new downloads found!');
-    return true;
+    return Promise.resolve(true);
   }
 
-  private async waitAndClick({ name, selector }: { name: string; selector: string }) {
+  private async waitAndClick({ name, selector }: { name: string; selector: string }): Promise<void> {
     while (true) {
       try {
         console.log(`[Human] Waiting for ${name}`);
@@ -231,7 +247,7 @@ class Human {
         await this._page.click(selector);
         await this.wait(345);
         console.log(`[Human] Success! (${name})`);
-        break;
+        return Promise.resolve();
       } catch (ex) {
         console.log(`[Human] error when waiting and clicking "${name}", trying again`);
       }
