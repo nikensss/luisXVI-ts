@@ -1,5 +1,6 @@
 import { promises as fs, PathLike } from 'fs';
 import { Page } from 'puppeteer';
+import ora, { Ora } from 'ora';
 
 class Human {
   private _page: Page;
@@ -220,7 +221,7 @@ class Human {
   }
 
   private async waitForNewDownload(): Promise<boolean> {
-    console.log('[Human] waiting for new downloads');
+    const spinner: Ora = ora({ text: 'Waiting for new downloads', prefixText: '[Human]' }).start();
     const startTime = new Date();
     let now = new Date();
     let currentDownloads = this._downloads;
@@ -229,11 +230,11 @@ class Human {
       await this.wait(400);
       now = new Date();
       if (now.getTime() - startTime.getTime() > Human.MAX_PATIENCE) {
-        console.log(`[Human] I've waited for ${(now.getTime() - startTime.getTime()) / 1000} seconds, I am tired!`);
+        spinner.fail(`I've waited for ${(now.getTime() - startTime.getTime()) / 1000} seconds, I am tired!`);
         return Promise.resolve(false);
       }
     }
-    console.log('[Human] new downloads found!');
+    spinner.succeed('new downloads found!');
     return Promise.resolve(true);
   }
 
@@ -243,7 +244,7 @@ class Human {
         console.log(`[Human] Waiting for ${name}`);
         await this._page.waitForSelector(selector);
         await this.wait(234);
-        console.log(`[Human] Clicking on ${name} (Selector : ${selector})`);
+        console.log(`[Human] Clicking on ${name}`);
         await this._page.click(selector);
         await this.wait(345);
         console.log(`[Human] Success! (${name})`);
