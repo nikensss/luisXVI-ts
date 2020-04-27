@@ -106,3 +106,7 @@ dist
 downloads
 
 test.ts
+
+#Coses del mac
+
+.DS_Store
