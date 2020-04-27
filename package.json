@@ -10,6 +10,10 @@
   },
   "author": "Ricard Mallafre",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nikensss/luisXVI-ts.git"
+  },
   "devDependencies": {
     "@types/node": "^13.13.2",
     "ts-node": "^8.9.1",
