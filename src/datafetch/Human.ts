@@ -1,6 +1,7 @@
 import { promises as fs, PathLike } from 'fs';
 import { Page } from 'puppeteer';
 import ora, { Ora } from 'ora';
+import { default as wait } from 'delay';
 
 class Human {
   private _page: Page;
@@ -8,7 +9,7 @@ class Human {
   private _downloadPath: PathLike;
   private _last28days: string = '';
 
-  public static readonly MAX_PATIENCE: number = 60000;
+  public static readonly MAX_PATIENCE: number = 60_000;
   public static readonly CALENDAR_DROPDOWN: string = '#daterange-button';
   public static readonly TWEETS_NAVBAR: string = '.SharedNavBar--analytics';
   public static readonly TWEETS_LINK: string = `//a[contains(text(), 'Tweets')]`;
@@ -135,10 +136,6 @@ class Human {
 
   //Private methods
 
-  private async wait(ms: number): Promise<void> {
-    return await new Promise((resolve) => setTimeout(() => resolve(), ms));
-  }
-
   private async leftCalendarToPreviousMonth() {
     await this.waitAndClick({
       name: 'calendar left prev',
@@ -227,7 +224,7 @@ class Human {
     let currentDownloads = this._downloads;
     while (this._downloads === currentDownloads) {
       this._downloads = await this.countDownloads();
-      await this.wait(400);
+      await wait(400);
       now = new Date();
       if (now.getTime() - startTime.getTime() > Human.MAX_PATIENCE) {
         spinner.fail(`I've waited for ${(now.getTime() - startTime.getTime()) / 1000} seconds, I am tired!`);
@@ -243,10 +240,10 @@ class Human {
       try {
         console.log(`[Human] Waiting for ${name}`);
         await this._page.waitForSelector(selector);
-        await this.wait(234);
+        await wait(234);
         console.log(`[Human] Clicking on ${name}`);
         await this._page.click(selector);
-        await this.wait(345);
+        await wait(345);
         console.log(`[Human] Success! (${name})`);
         return Promise.resolve();
       } catch (ex) {

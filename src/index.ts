@@ -56,4 +56,6 @@ const downloadManager = new DownloadManager(DOWNLOAD_PATH);
     problematicPeriods.push({ name: account.name, value: await human.downloadPreviousMonths(24) });
   }
   console.log(JSON.stringify(problematicPeriods));
+
+  browser.close();
 })();

@@ -53,15 +53,21 @@ class Login {
         return Promise.resolve();
       } catch (ex) {
         tries += 1;
-        console.log('[Login] something went wrong while trying to login, trying again', ex);
+        this.logError('exception while trying to login', ex);
         if (tries > 30) throw new Error('Cannot log in!');
         if (tries % 5 === 0) this._page.reload();
+        this.log('trying again');
       }
     }
   }
 
   private log(msg: string) {
     console.log(`[Login] ${msg}`);
+  }
+
+  private logError(msg: string, ex: Error) {
+    this.log(msg);
+    this.log(ex.message);
   }
 }
 
