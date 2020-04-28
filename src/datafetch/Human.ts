@@ -2,6 +2,7 @@ import { promises as fs, PathLike } from 'fs';
 import { Page } from 'puppeteer';
 import ora, { Ora } from 'ora';
 import { default as wait } from 'delay';
+import Timer from '../utils/Timer';
 
 class Human {
   private _page: Page;
@@ -9,14 +10,13 @@ class Human {
   private _downloadPath: PathLike;
   private _last28days: string = '';
 
-  public static readonly MAX_PATIENCE: number = 60_000;
+  public static readonly MAX_PATIENCE: number = 60e3;
   public static readonly CALENDAR_DROPDOWN: string = '#daterange-button';
   public static readonly TWEETS_NAVBAR: string = '.SharedNavBar--analytics';
   public static readonly TWEETS_LINK: string = `//a[contains(text(), 'Tweets')]`;
   public static readonly EXPORTAR_DATOS: string = '#export > button > span.ladda-label';
   public static readonly BY_TWEET: string = '#export > ul > li:nth-child(1) > button[data-type="by_tweet"]';
-  public static readonly UPDATE: string =
-    'body > div.daterangepicker.dropdown-menu.opensleft.show-calendar > div.ranges > div > button.applyBtn.btn.btn-sm.btn-primary';
+  public static readonly UPDATE: string = 'div.daterangepicker > div.ranges > div > button.applyBtn';
   public static readonly DATE_RANGE_TITLE: string = '#daterange-button > span.daterange-selected';
   public static readonly DATE_RANGES: string = '.ranges > ul > li';
   public static readonly CALENDAR_LEFT_PREV: string =
@@ -43,55 +43,10 @@ class Human {
     await this._page.waitForXPath(Human.TWEETS_LINK);
     const tweetsLink = await this._page.$x(Human.TWEETS_LINK);
     if (tweetsLink.length > 0) {
-      await tweetsLink[0].click();
-      return Promise.resolve();
+      return await tweetsLink[0].click();
     } else {
       throw new Error('[Human] Could not click on the "Tweets" link!');
     }
-  }
-
-  /**
-   * Toggles the visibility of the calendar.
-   */
-  async toggleCalendar(): Promise<void> {
-    return await this.waitAndClick({
-      name: 'calendar dropdown',
-      selector: Human.CALENDAR_DROPDOWN
-    });
-  }
-
-  /**
-   * Clicks on the 'Export data' button followed by the 'By tweet' button.
-   * Will start a download.
-   */
-  async exportDataByTweet(): Promise<boolean> {
-    await this.waitAndClick({
-      name: 'export data',
-      selector: Human.EXPORTAR_DATOS
-    });
-
-    this._downloads = await this.countDownloads();
-    await this.waitAndClick({
-      name: 'by tweet',
-      selector: Human.BY_TWEET
-    });
-    const result = await this.waitForNewDownload();
-    console.log('[Human] exported by tweet', result);
-    return result;
-  }
-
-  /**
-   * Clicks the 'Update' button to set the new time range.
-   */
-  async update(): Promise<void> {
-    return await this.waitAndClick({ name: 'update', selector: Human.UPDATE });
-  }
-
-  async selectCurrentMonth(): Promise<void> {
-    console.log('[Human] I am trying to find the first day of the month!');
-    await this._page.waitForSelector(Human.DATE_RANGES);
-    console.log('[Human] Clicking current month');
-    return await this._page.$$eval(Human.DATE_RANGES, (elements) => (<HTMLElement>elements[2]).click());
   }
 
   /**
@@ -135,6 +90,50 @@ class Human {
   }
 
   //Private methods
+
+  /**
+   * Toggles the visibility of the calendar.
+   */
+  private async toggleCalendar(): Promise<void> {
+    return await this.waitAndClick({
+      name: 'calendar dropdown',
+      selector: Human.CALENDAR_DROPDOWN
+    });
+  }
+
+  /**
+   * Clicks on the 'Export data' button followed by the 'By tweet' button.
+   * Will start a download.
+   */
+  private async exportDataByTweet(): Promise<boolean> {
+    await this.waitAndClick({
+      name: 'export data',
+      selector: Human.EXPORTAR_DATOS
+    });
+
+    this._downloads = await this.countDownloads();
+    await this.waitAndClick({
+      name: 'by tweet',
+      selector: Human.BY_TWEET
+    });
+    const result = await this.waitForNewDownload();
+    console.log('[Human] exported by tweet', result);
+    return result;
+  }
+
+  /**
+   * Clicks the 'Update' button to set the new time range.
+   */
+  private async update(): Promise<void> {
+    return await this.waitAndClick({ name: 'update', selector: Human.UPDATE });
+  }
+
+  private async selectCurrentMonth(): Promise<void> {
+    console.log('[Human] I am trying to find the first day of the month!');
+    await this._page.waitForSelector(Human.DATE_RANGES);
+    console.log('[Human] Clicking current month');
+    return await this._page.$$eval(Human.DATE_RANGES, (elements) => (<HTMLElement>elements[2]).click());
+  }
 
   private async leftCalendarToPreviousMonth() {
     await this.waitAndClick({
@@ -219,15 +218,13 @@ class Human {
 
   private async waitForNewDownload(): Promise<boolean> {
     const spinner: Ora = ora({ text: 'Waiting for new downloads', prefixText: '[Human]' }).start();
-    const startTime = new Date();
-    let now = new Date();
+    const timer: Timer = new Timer(Human.MAX_PATIENCE);
     let currentDownloads = this._downloads;
     while (this._downloads === currentDownloads) {
       this._downloads = await this.countDownloads();
       await wait(400);
-      now = new Date();
-      if (now.getTime() - startTime.getTime() > Human.MAX_PATIENCE) {
-        spinner.fail(`I've waited for ${(now.getTime() - startTime.getTime()) / 1000} seconds, I am tired!`);
+      if (timer.isTimeout()) {
+        spinner.fail(`No new downloads! Tururut violes!🌺`);
         return Promise.resolve(false);
       }
     }

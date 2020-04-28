@@ -20,10 +20,6 @@ class DownloadManager {
     return this._downloadPath;
   }
 
-  public set path(p: PathLike) {
-    this._downloadPath = p;
-  }
-
   /**
    * Deletes all the files in the
    */

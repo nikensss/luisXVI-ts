@@ -37,8 +37,8 @@ class AccountManager {
     this._page = page;
   }
 
-  addAccount(account: string): void {
-    this._accounts.push(new Account(account));
+  addAccount(account: Account): void {
+    this._accounts.push(account);
   }
 
   get accounts(): Account[] {
