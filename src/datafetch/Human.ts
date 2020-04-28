@@ -75,8 +75,9 @@ class Human {
       await this.rightCalendarToPreviousMonth();
       await this.selectLastDayOfMonth();
       await this.update();
-
+      console.log(`[Human] current period: ${await this.getDateRangeTitle()}`);
       if (await this.checkForLast28Days()) {
+        console.log('[Human] moving on...');
         break;
       }
 
@@ -116,9 +117,7 @@ class Human {
       name: 'by tweet',
       selector: Human.BY_TWEET
     });
-    const result = await this.waitForNewDownload();
-    console.log('[Human] exported by tweet', result);
-    return result;
+    return await this.waitForNewDownload();
   }
 
   /**
@@ -129,9 +128,7 @@ class Human {
   }
 
   private async selectCurrentMonth(): Promise<void> {
-    console.log('[Human] I am trying to find the first day of the month!');
     await this._page.waitForSelector(Human.DATE_RANGES);
-    console.log('[Human] Clicking current month');
     return await this._page.$$eval(Human.DATE_RANGES, (elements) => (<HTMLElement>elements[2]).click());
   }
 
@@ -150,9 +147,8 @@ class Human {
   }
 
   private async selectFirstDayOfMonth() {
-    console.log('[Human] Waiting for select first day of the month...');
     await this._page.waitForSelector(Human.CALENDAR_LEFT_TBODY);
-    console.log('[Human] Selecting first day of month...');
+    console.log('[Human] selecting first day of month');
     await this._page.$eval(Human.CALENDAR_LEFT_TBODY, (element) => {
       const rows = [...element.children];
       for (let row of rows) {
@@ -166,12 +162,11 @@ class Human {
         }
       }
     });
-    console.log('[Human] First day selected!');
   }
 
   private async selectLastDayOfMonth() {
     await this._page.waitForSelector(Human.CALENDAR_RIGHT_TBODY);
-    console.log('[Human] Selecting last day of month...');
+    console.log('[Human] selecting last day of month');
     await this._page.$eval(Human.CALENDAR_RIGHT_TBODY, (element) => {
       const rows = [...element.children].reverse();
       let firstDayFound = false;
@@ -188,7 +183,6 @@ class Human {
         }
       }
     });
-    console.log('[Human] Last day selected!');
   }
 
   private async checkForLast28Days() {
@@ -202,7 +196,6 @@ class Human {
       await this.toggleCalendar(); //TODO: should leave the state as it was before entering
     }
     const dateRange = await this.getDateRangeTitle();
-    console.log(`[Human] expected: '${this._last28days}', found: '${dateRange}'`);
     return this._last28days === dateRange;
   }
 
@@ -220,6 +213,7 @@ class Human {
     const spinner: Ora = ora({ text: 'Waiting for new downloads', prefixText: '[Human]' }).start();
     const timer: Timer = new Timer(Human.MAX_PATIENCE);
     let currentDownloads = this._downloads;
+    timer.start();
     while (this._downloads === currentDownloads) {
       this._downloads = await this.countDownloads();
       await wait(400);
@@ -235,13 +229,11 @@ class Human {
   private async waitAndClick({ name, selector }: { name: string; selector: string }): Promise<void> {
     while (true) {
       try {
-        console.log(`[Human] Waiting for ${name}`);
         await this._page.waitForSelector(selector);
         await wait(234);
-        console.log(`[Human] Clicking on ${name}`);
+        console.log(`[Human] clicking on ${name}`);
         await this._page.click(selector);
         await wait(345);
-        console.log(`[Human] Success! (${name})`);
         return Promise.resolve();
       } catch (ex) {
         console.log(`[Human] error when waiting and clicking "${name}", trying again`);
