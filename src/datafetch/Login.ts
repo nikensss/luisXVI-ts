@@ -1,7 +1,4 @@
-import dotenv from 'dotenv';
 import { Page } from 'puppeteer';
-
-const result = dotenv.config();
 
 /**
  * Performs the login operation. Keeps trying until it works.
@@ -11,9 +8,9 @@ class Login {
   private _user: string;
   private _pass: string;
 
-  public static readonly USERNAME_INPUT_SELECTOR: string = 'input[name="session[username_or_email]"]';
-  public static readonly PASSWORD_INPUT_SELECTOR: string = 'input[name="session[password]"]';
-  public static readonly LOGIN_BUTTON_SELECTOR: string = 'div[data-testid="LoginForm_Login_Button"]';
+  private static readonly USERNAME_INPUT_SELECTOR: string = 'input[name="session[username_or_email]"]';
+  private static readonly PASSWORD_INPUT_SELECTOR: string = 'input[name="session[password]"]';
+  private static readonly LOGIN_BUTTON_SELECTOR: string = 'div[data-testid="LoginForm_Login_Button"]';
 
   constructor(page: Page) {
     if (typeof process.env.user !== 'string' || typeof process.env.pass !== 'string') {

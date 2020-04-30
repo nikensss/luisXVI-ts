@@ -8,8 +8,8 @@ class AccountManager {
   private _page: Page;
   private _accounts: Account[] = [];
 
-  public static readonly ACCOUNT_SELECTOR: string = 'ul.AccountSelector-accounts > li';
-  public static readonly AVATAR_SELECTOR: string = 'ul.AccountSelector-accounts > li > div > div > img';
+  private static readonly ACCOUNT_SELECTOR: string = 'ul.AccountSelector-accounts > li';
+  private static readonly AVATAR_SELECTOR: string = 'ul.AccountSelector-accounts > li > div > div > img';
 
   constructor(page: Page) {
     this._page = page;

@@ -11,14 +11,12 @@ import Tweet from './analytics/Tweet';
 
 class LuisXVI {
   private _downloadManager: DownloadManager;
-  private _verbose: boolean;
 
-  public static readonly DOWNLOAD_PATH: PathLike = path.join(__dirname, 'downloads');
-  public static readonly VIEWPORT: Viewport = { width: 1600, height: 800 };
+  private static readonly DOWNLOAD_PATH: PathLike = path.join(__dirname, 'downloads');
+  private static readonly VIEWPORT: Viewport = { width: 1600, height: 800 };
 
-  constructor(verbose: boolean) {
+  constructor() {
     this._downloadManager = new DownloadManager(LuisXVI.DOWNLOAD_PATH);
-    this._verbose = verbose;
   }
 
   async execute(amount: number): Promise<void> {
@@ -79,7 +77,7 @@ class LuisXVI {
   }
 
   private log(msg: string): void {
-    if (this._verbose) console.log(`[LuisXVI] ${msg}`);
+    if (process.env.verbose === 'true') console.log(`[LuisXVI] ${msg}`);
   }
 }
 

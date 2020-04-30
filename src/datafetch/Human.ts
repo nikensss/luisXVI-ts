@@ -10,20 +10,20 @@ class Human {
   private _downloadPath: PathLike;
   private _last28days: string = '';
 
-  public static readonly MAX_PATIENCE: number = 60e3;
-  public static readonly CALENDAR_DROPDOWN: string = '#daterange-button';
-  public static readonly TWEETS_NAVBAR: string = '.SharedNavBar--analytics';
-  public static readonly TWEETS_LINK: string = `//a[contains(text(), 'Tweets')]`;
-  public static readonly EXPORTAR_DATOS: string = '#export > button > span.ladda-label';
-  public static readonly BY_TWEET: string = '#export > ul > li:nth-child(1) > button[data-type="by_tweet"]';
-  public static readonly UPDATE: string = 'div.daterangepicker > div.ranges > div > button.applyBtn';
-  public static readonly DATE_RANGE_TITLE: string = '#daterange-button > span.daterange-selected';
-  public static readonly DATE_RANGES: string = '.ranges > ul > li';
-  public static readonly CALENDAR_LEFT_PREV: string =
+  private static readonly MAX_PATIENCE: number = 60e3;
+  private static readonly CALENDAR_DROPDOWN: string = '#daterange-button';
+  private static readonly TWEETS_NAVBAR: string = '.SharedNavBar--analytics';
+  private static readonly TWEETS_LINK: string = `//a[contains(text(), 'Tweets')]`;
+  private static readonly EXPORTAR_DATOS: string = '#export > button > span.ladda-label';
+  private static readonly BY_TWEET: string = '#export > ul > li:nth-child(1) > button[data-type="by_tweet"]';
+  private static readonly UPDATE: string = 'div.daterangepicker > div.ranges > div > button.applyBtn';
+  private static readonly DATE_RANGE_TITLE: string = '#daterange-button > span.daterange-selected';
+  private static readonly DATE_RANGES: string = '.ranges > ul > li';
+  private static readonly CALENDAR_LEFT_PREV: string =
     '.calendar.left > .calendar-date > table > thead > tr > th.prev.available';
-  public static readonly CALENDAR_LEFT_TBODY: string = '.calendar.left > .calendar-date > table > tbody';
-  public static readonly CALENDAR_RIGHT_TBODY: string = '.calendar.right > .calendar-date > table > tbody';
-  public static readonly CALENDAR_RIGHT_PREV: string =
+  private static readonly CALENDAR_LEFT_TBODY: string = '.calendar.left > .calendar-date > table > tbody';
+  private static readonly CALENDAR_RIGHT_TBODY: string = '.calendar.right > .calendar-date > table > tbody';
+  private static readonly CALENDAR_RIGHT_PREV: string =
     '.calendar.right > .calendar-date > table > thead > tr > th.prev.available';
 
   constructor({ page, downloadPath }: { page: Page; downloadPath: PathLike }) {
