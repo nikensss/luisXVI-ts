@@ -90,6 +90,14 @@ class Human {
     return problematicPeriods;
   }
 
+  async enableDownloads(downloadPath: PathLike): Promise<void> {
+    const client = await this._page.target().createCDPSession();
+    await client.send('Page.setDownloadBehavior', {
+      behavior: 'allow',
+      downloadPath: downloadPath
+    });
+  }
+
   //Private methods
 
   /**

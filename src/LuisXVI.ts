@@ -1,22 +1,27 @@
-import { PathLike } from 'fs';
+import { promises as fs, PathLike } from 'fs';
 import path from 'path';
 import puppeteer, { Viewport } from 'puppeteer';
 import DownloadManager from './datafetch/DownloadManager';
 import Login from './datafetch/Login';
-import AccountManager, { Account } from './datafetch/AccountManager';
+import AccountManager from './datafetch/AccountManager';
 import Human from './datafetch/Human';
+import Account from './datafetch/Account';
+import CsvHandler from './analytics/CsvHandler';
+import Tweet from './analytics/Tweet';
 
 class LuisXVI {
   private _downloadManager: DownloadManager;
+  private _verbose: boolean;
 
   public static readonly DOWNLOAD_PATH: PathLike = path.join(__dirname, 'downloads');
   public static readonly VIEWPORT: Viewport = { width: 1600, height: 800 };
 
-  constructor() {
+  constructor(verbose: boolean) {
     this._downloadManager = new DownloadManager(LuisXVI.DOWNLOAD_PATH);
+    this._verbose = verbose;
   }
 
-  async execute(): Promise<void> {
+  async execute(amount: number): Promise<void> {
     this._downloadManager.flush();
 
     const browser = await puppeteer.launch({
@@ -31,7 +36,7 @@ class LuisXVI {
 
     const login = new Login(page);
     await login.login();
-    console.log('[LuisXVI] logged in!');
+    this.log('logged in!');
 
     const accountManager = new AccountManager(page);
 
@@ -48,22 +53,33 @@ class LuisXVI {
     let problematicPeriods: Array<{ name: string; value: string[] }> = [];
 
     for (let account of accountManager.accounts) {
-      console.log(`[LuisXVI] starting csv downloads for ${account.name}`);
+      //TODO: use generator method from AccountManager
+      this.log(`starting csv downloads for ${account.name}`);
       await page.goto(account.link);
-      const client = await page.target().createCDPSession();
-      await client.send('Page.setDownloadBehavior', {
-        behavior: 'allow',
-        downloadPath: this._downloadManager.path
-      });
       human.page = page;
+      await human.enableDownloads(this._downloadManager.path);
       await human.tweets();
       await human.downloadCurrentMonth();
-      problematicPeriods.push({ name: account.name, value: await human.downloadPreviousMonths(12) });
-      console.log(`[LuisXVI] finished downloading csv's for ${account.name}`);
+      problematicPeriods.push({ name: account.name, value: await human.downloadPreviousMonths(amount - 1) });
+      this.log(`finished downloading csv's for ${account.name}`);
     }
-    console.log(JSON.stringify(problematicPeriods));
+    this.log(JSON.stringify(problematicPeriods));
 
     browser.close();
+  }
+
+  async crunch() {
+    this.log('crunching!');
+    const csvPaths: PathLike[] = await fs
+      .readdir(this._downloadManager.path)
+      .then((files) => files.map((n) => path.join(this._downloadManager.path.toString(), n)));
+    const csvHandler: CsvHandler = new CsvHandler();
+    const tweets: Tweet[] = await csvHandler.parseMultiple(csvPaths);
+    console.log();
+  }
+
+  private log(msg: string): void {
+    if (this._verbose) console.log(`[LuisXVI] ${msg}`);
   }
 }
 
