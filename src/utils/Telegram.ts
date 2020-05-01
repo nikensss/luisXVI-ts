@@ -1,7 +1,10 @@
-import axios from 'axios';
+import { default as Bot } from 'node-telegram-bot-api';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 class Telegram {
   private static instance: Telegram;
+  private bot: Bot;
   private token: string;
   private url: string = 'http://api.telegram.org/bot';
 
@@ -11,6 +14,26 @@ class Telegram {
       throw new Error('[Telegram] Invalid telergam token! ' + process.env.telegram_token);
     }
     this.token = process.env.telegram_token;
+    process.env.NTBA_FIX_319 = '1';
+    //fixes telegram warning abobut 'Automatic enabling of cancellation of promises is deprecated.'
+
+    this.bot = new Bot(this.token, { polling: true });
+    console.log('[Telegram] LuisXVIBot up an running');
+
+    this.bot.on('text', async (msg) => {
+      const chatId = msg.chat.id;
+
+      if (msg.text?.startsWith('/id')) {
+        this.bot.sendMessage(chatId, `ID is ${chatId}`);
+        return;
+      }
+      if (msg.text?.startsWith('/downloads')) {
+        const files = await fs.readdir(path.join(__dirname, '..', 'downloads'));
+        this.bot.sendMessage(chatId, `Downloaded files:\n${files.join('\n')}`);
+      }
+    });
+
+    this.bot.sendMessage(-424947557, 'I am listening.');
   }
 
   public static getInstance(): Telegram {
@@ -21,20 +44,8 @@ class Telegram {
     return Telegram.instance;
   }
 
-  public sendMessage(msg: string): void {
-    this.api('sendMessage', { name: 'text', value: msg });
-  }
-
-  public async getUpdates() {
-    console.log('getting updates');
-    const result = await axios.get('getUpdates');
-    console.log(result);
-  }
-
-  private async api(method: string, ...params: [{ name: string; value: string }]) {
-    return axios.post(
-      this.url + this.token + '/' + method + '?' + params?.map((e) => `${e.name}=${e.value}`).join('&')
-    );
+  public sendMessage(chatId: number, msg: string): void {
+    this.bot.sendMessage(chatId, msg);
   }
 }
 

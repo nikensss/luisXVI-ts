@@ -20,11 +20,12 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "@types/node-telegram-bot-api": "^0.40.3",
     "@types/puppeteer": "^2.0.1",
-    "axios": "^0.19.2",
     "delay": "^4.3.0",
     "dotenv": "^8.2.0",
     "neat-csv": "^5.2.0",
+    "node-telegram-bot-api": "^0.40.0",
     "ora": "^4.0.4",
     "puppeteer": "^3.0.1"
   }

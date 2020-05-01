@@ -8,4 +8,4 @@ const result = dotenv.config();
 // luisXVI.execute(4).then(() => luisXVI.crunch());
 // luisXVI.crunch();
 
-Telegram.getInstance().getUpdates();
+Telegram.getInstance();
