@@ -6,7 +6,6 @@ class Telegram {
   private static instance: Telegram;
   private bot: Bot;
   private token: string;
-  private url: string = 'http://api.telegram.org/bot';
 
   private constructor() {
     if (typeof process.env.telegram_token !== 'string') {
