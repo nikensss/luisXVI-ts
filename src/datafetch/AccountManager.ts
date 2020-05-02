@@ -50,7 +50,7 @@ class AccountManager {
       if (!ex.message.includes('waiting for selector "ul.AccountSelector-accounts > li')) {
         throw ex;
       }
-      const url = await this._page.url();
+      const url = this._page.url();
       const accountName = url.replace(/.*\/user\/(.+)\/.*/, '$1');
       this._accounts.push(new Account(accountName));
     }
