@@ -7,14 +7,14 @@ class Telegram {
   private static instance: Telegram;
   private bot: Bot;
   private token: string;
-  private thisIsNotEnoughPizza: string;
+  private defaultChatId: string;
 
   private constructor() {
-    if (typeof process.env.telegram_token !== 'string') {
-      console.log(typeof process.env.telegram_token);
-      throw new Error('[Telegram] Invalid telergam token! ' + process.env.telegram_token);
+    if (typeof process.env.telegramToken !== 'string') {
+      console.log(typeof process.env.telegramToken);
+      throw new Error('[Telegram] Invalid telergam token! ' + process.env.telegramToken);
     }
-    this.token = process.env.telegram_token;
+    this.token = process.env.telegramToken;
     //fixes telegram warning abobut 'Automatic enabling of cancellation of promises is deprecated.'
     process.env.NTBA_FIX_319 = '1';
 
@@ -34,11 +34,11 @@ class Telegram {
       }
     });
 
-    if (process.env.thisIsNotEnoughPizza) {
-      this.thisIsNotEnoughPizza = process.env.thisIsNotEnoughPizza;
+    if (process.env.defaultChatId) {
+      this.defaultChatId = process.env.defaultChatId;
       this.notifyWake();
     } else {
-      this.thisIsNotEnoughPizza = '';
+      this.defaultChatId = '';
       console.error("[Telegram] No default chat id is present in .env, can't notify start up.");
     }
   }
@@ -56,12 +56,12 @@ class Telegram {
   }
 
   public sendDefault(msg: string, options?: {}): void {
-    if (this.thisIsNotEnoughPizza === '') {
+    if (this.defaultChatId === '') {
       console.warn(
         `[Telegram] Can't send to default chat because there is no default chat id defined`
       );
     }
-    this.sendMessage(this.thisIsNotEnoughPizza, msg, options);
+    this.sendMessage(this.defaultChatId, msg, options);
   }
 
   public sendQuiet(msg: string, options?: {}): void {
@@ -76,7 +76,7 @@ class Telegram {
 
   // Private implementations
   private notifyWake(): void {
-    this.bot.sendMessage(this.thisIsNotEnoughPizza, 'I am listening.');
+    this.bot.sendMessage(this.defaultChatId, 'I am listening.');
   }
 }
 
