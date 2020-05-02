@@ -71,9 +71,7 @@ class LuisXVI {
     const csvPaths: PathLike[] = await fs
       .readdir(this._downloadManager.path)
       .then((files) => files.map((n) => path.join(this._downloadManager.path.toString(), n)));
-    const csvHandler: CsvHandler = new CsvHandler();
-    const tweets: Tweet[] = await csvHandler.parseMultiple(csvPaths);
-    console.log();
+    const tweets: Tweet[] = await CsvHandler.parseMultiple(csvPaths);
   }
 
   private log(msg: string): void {

@@ -13,8 +13,8 @@ class Telegram {
       throw new Error('[Telegram] Invalid telergam token! ' + process.env.telegram_token);
     }
     this.token = process.env.telegram_token;
-    process.env.NTBA_FIX_319 = '1';
     //fixes telegram warning abobut 'Automatic enabling of cancellation of promises is deprecated.'
+    process.env.NTBA_FIX_319 = '1';
 
     this.bot = new Bot(this.token, { polling: true });
     console.log('[Telegram] LuisXVIBot up an running');
@@ -32,7 +32,11 @@ class Telegram {
       }
     });
 
-    this.bot.sendMessage(-424947557, 'I am listening.');
+    if (process.env.telegram_chat_id) {
+      this.bot.sendMessage(process.env.telegram_chat_id, 'I am listening.');
+    } else {
+      console.error("[Telegram] No default chat id is present in .env, can't notify start up.");
+    }
   }
 
   public static getInstance(): Telegram {

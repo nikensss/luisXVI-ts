@@ -4,8 +4,8 @@ import dotenv from 'dotenv';
 
 const result = dotenv.config();
 
-// const luisXVI: LuisXVI = new LuisXVI();
+const luisXVI: LuisXVI = new LuisXVI();
 // luisXVI.execute(4).then(() => luisXVI.crunch());
-// luisXVI.crunch();
+luisXVI.crunch();
 
-Telegram.getInstance();
+// Telegram.getInstance();
