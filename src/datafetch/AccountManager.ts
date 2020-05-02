@@ -9,7 +9,8 @@ class AccountManager {
   private _accounts: Account[] = [];
 
   private static readonly ACCOUNT_SELECTOR: string = 'ul.AccountSelector-accounts > li';
-  private static readonly AVATAR_SELECTOR: string = 'ul.AccountSelector-accounts > li > div > div > img';
+  private static readonly AVATAR_SELECTOR: string =
+    'ul.AccountSelector-accounts > li > div > div > img';
 
   constructor(page: Page) {
     this._page = page;
@@ -29,19 +30,32 @@ class AccountManager {
     }
   }
 
+  async goToAccounts() {
+    await this._page.goto('https://analytics.twitter.com/accounts');
+  }
+
   async updateAccounts(): Promise<void> {
-    await this._page.waitForSelector(AccountManager.ACCOUNT_SELECTOR);
-    console.log('getting user ids');
-    const result = await this._page.$$eval(AccountManager.AVATAR_SELECTOR, (avatars) =>
-      avatars.map((avatar) => avatar.getAttribute('alt'))
-    );
-    for (let account of result) {
-      if (account !== null) {
-        this._accounts.push(new Account(account));
+    try {
+      await this._page.waitForSelector(AccountManager.ACCOUNT_SELECTOR);
+      console.log('getting user ids');
+      const result = await this._page.$$eval(AccountManager.AVATAR_SELECTOR, (avatars) =>
+        avatars.map((avatar) => avatar.getAttribute('alt'))
+      );
+      for (let account of result) {
+        if (account !== null) {
+          this._accounts.push(new Account(account));
+        }
       }
+    } catch (ex) {
+      if (!ex.message.includes('waiting for selector "ul.AccountSelector-accounts > li')) {
+        throw ex;
+      }
+      const url = await this._page.url();
+      const accountName = url.replace(/.*\/user\/(.+)\/.*/, '$1');
+      this._accounts.push(new Account(accountName));
     }
 
-    console.log(this._accounts);
+    console.log(`[AccountManager] using '${this._accounts}'`);
     return Promise.resolve();
   }
 }

@@ -10,6 +10,7 @@ import CsvHandler from './analytics/CsvHandler';
 import Tweet from './analytics/Tweet';
 import KurtGodel from './analytics/KurtGodel';
 import Telegram from './utils/Telegram';
+import ProblematicPeriods from './datafetch/interfaces/ProblematicPeriods';
 
 class LuisXVI {
   private _downloadManager: DownloadManager;
@@ -21,16 +22,13 @@ class LuisXVI {
     this._downloadManager = new DownloadManager(LuisXVI.DOWNLOAD_PATH);
   }
 
-  async execute(amount: number): Promise<void> {
+  async fetchData(amount: number): Promise<void> {
+    if (amount <= 0) throw new Error(`Given amount must be greater than 0, received: ${amount}`);
+
     this._downloadManager.flush();
 
-    const browser = await puppeteer.launch({
-      headless: false,
-      args: ['--start-fullscreen']
-    });
-
+    const browser = await puppeteer.launch();
     const page = (await browser.pages())[0];
-
     await page.setViewport(LuisXVI.VIEWPORT);
     await page.goto('https://www.twitter.com');
 
@@ -39,32 +37,24 @@ class LuisXVI {
     this.log('logged in!');
 
     const accountManager = new AccountManager(page);
-
-    if (login.user.includes('rikitzzz')) {
-      console.log('[LuisXVI] setting account for accountManager');
-      accountManager.addAccount(new Account('MrPiglover'));
-    } else {
-      await page.goto('https://analytics.twitter.com/accounts');
-      await accountManager.updateAccounts();
-    }
+    await accountManager.goToAccounts();
+    await accountManager.updateAccounts();
 
     const human = new Human({
       page: page,
       downloadPath: this._downloadManager.path
     });
-
-    let problematicPeriods: Array<{ name: string; value: string[] }> = [];
+    let problematicPeriods: ProblematicPeriods[] = [];
 
     for (let account of accountManager.accounts) {
       this.log(`starting csv downloads for ${account.name}`);
-      await page.goto(account.link);
-      human.page = page;
+      await human.page.goto(account.link);
       await human.enableDownloads(this._downloadManager.path);
-      await human.tweets();
+      await human.goToTweets();
       await human.downloadCurrentMonth();
       problematicPeriods.push({
-        name: account.name,
-        value: await human.downloadPreviousMonths(amount - 1)
+        account: account,
+        periods: await human.downloadPreviousMonths(amount - 1)
       });
       this.log(`finished downloading csv's for ${account.name}`);
     }
@@ -75,9 +65,7 @@ class LuisXVI {
 
   async crunch() {
     this.log('crunching!');
-    const csvPaths: PathLike[] = await fs
-      .readdir(this._downloadManager.path)
-      .then((files) => files.map((n) => path.join(this._downloadManager.path.toString(), n)));
+    const csvPaths: PathLike[] = this._downloadManager.listDownloads();
     const tweets: Tweet[] = await CsvHandler.parseMultiple(csvPaths);
     const kurt = new KurtGodel(tweets);
     const impressions = kurt.monthlySum('likes');
@@ -88,6 +76,8 @@ class LuisXVI {
   public get downloadPath(): PathLike {
     return this._downloadManager.path;
   }
+
+  //Private implementations
 
   private log(msg: string): void {
     if (process.env.verbose === 'true') console.log(`[LuisXVI] ${msg}`);

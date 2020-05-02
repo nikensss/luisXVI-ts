@@ -15,14 +15,18 @@ class Human {
   private static readonly TWEETS_NAVBAR: string = '.SharedNavBar--analytics';
   private static readonly TWEETS_LINK: string = `//a[contains(text(), 'Tweets')]`;
   private static readonly EXPORTAR_DATOS: string = '#export > button > span.ladda-label';
-  private static readonly BY_TWEET: string = '#export > ul > li:nth-child(1) > button[data-type="by_tweet"]';
-  private static readonly UPDATE: string = 'div.daterangepicker > div.ranges > div > button.applyBtn';
+  private static readonly BY_TWEET: string =
+    '#export > ul > li:nth-child(1) > button[data-type="by_tweet"]';
+  private static readonly UPDATE: string =
+    'div.daterangepicker > div.ranges > div > button.applyBtn';
   private static readonly DATE_RANGE_TITLE: string = '#daterange-button > span.daterange-selected';
   private static readonly DATE_RANGES: string = '.ranges > ul > li';
   private static readonly CALENDAR_LEFT_PREV: string =
     '.calendar.left > .calendar-date > table > thead > tr > th.prev.available';
-  private static readonly CALENDAR_LEFT_TBODY: string = '.calendar.left > .calendar-date > table > tbody';
-  private static readonly CALENDAR_RIGHT_TBODY: string = '.calendar.right > .calendar-date > table > tbody';
+  private static readonly CALENDAR_LEFT_TBODY: string =
+    '.calendar.left > .calendar-date > table > tbody';
+  private static readonly CALENDAR_RIGHT_TBODY: string =
+    '.calendar.right > .calendar-date > table > tbody';
   private static readonly CALENDAR_RIGHT_PREV: string =
     '.calendar.right > .calendar-date > table > thead > tr > th.prev.available';
 
@@ -35,10 +39,13 @@ class Human {
     this._page = page;
   }
 
+  get page(): Page {
+    return this._page;
+  }
   /**
    * Goes to the 'Tweets' link. One of the three options on the top-left navbar.
    */
-  async tweets(): Promise<void> {
+  async goToTweets(): Promise<void> {
     console.log('[Human] I am going to /tweets!');
     await this._page.waitForXPath(Human.TWEETS_LINK);
     const tweetsLink = await this._page.$x(Human.TWEETS_LINK);
@@ -137,7 +144,9 @@ class Human {
 
   private async selectCurrentMonth(): Promise<void> {
     await this._page.waitForSelector(Human.DATE_RANGES);
-    return await this._page.$$eval(Human.DATE_RANGES, (elements) => (<HTMLElement>elements[2]).click());
+    return await this._page.$$eval(Human.DATE_RANGES, (elements) =>
+      (<HTMLElement>elements[2]).click()
+    );
   }
 
   private async leftCalendarToPreviousMonth() {
@@ -200,7 +209,10 @@ class Human {
     if (!this._last28days) {
       await this.toggleCalendar(); //TODO: should be 'this.openCalendar()'
       await this._page.waitForSelector(Human.DATE_RANGES);
-      this._last28days = await this._page.$$eval(Human.DATE_RANGES, (elements) => (<HTMLElement>elements[1]).innerText);
+      this._last28days = await this._page.$$eval(
+        Human.DATE_RANGES,
+        (elements) => (<HTMLElement>elements[1]).innerText
+      );
       await this.toggleCalendar(); //TODO: should leave the state as it was before entering
     }
     const dateRange = await this.getDateRangeTitle();
@@ -234,7 +246,13 @@ class Human {
     return Promise.resolve(true);
   }
 
-  private async waitAndClick({ name, selector }: { name: string; selector: string }): Promise<void> {
+  private async waitAndClick({
+    name,
+    selector
+  }: {
+    name: string;
+    selector: string;
+  }): Promise<void> {
     while (true) {
       try {
         await this._page.waitForSelector(selector);

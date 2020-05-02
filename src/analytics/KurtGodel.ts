@@ -1,7 +1,7 @@
 import Tweet from './Tweet';
 import { default as groupby } from 'group-array';
-import YearMonthTweets from '../interfaces/YearMonthTweets';
-import YearMonthAggregation from '../interfaces/YearMonthAggregation';
+import YearMonthTweets from './interfaces/YearMonthTweets';
+import YearMonthAggregation from './interfaces/YearMonthAggregation';
 
 /**
  * Kurt Gödel is responsible for the mathematic aggregations over each tweet feature

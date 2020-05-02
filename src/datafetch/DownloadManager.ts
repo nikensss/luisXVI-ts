@@ -30,6 +30,12 @@ class DownloadManager {
     });
   }
 
+  public listDownloads(): PathLike[] {
+    return fs.readdirSync(this.path).map((n) => path.join(this.path.toString(), n));
+  }
+
+  //Private implementations
+
   private log(msg: string) {
     console.log(`[DownloadManager] ${msg}`);
   }

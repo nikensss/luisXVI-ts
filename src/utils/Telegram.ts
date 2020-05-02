@@ -1,6 +1,7 @@
 import { default as Bot } from 'node-telegram-bot-api';
 import { promises as fs } from 'fs';
 import path from 'path';
+import LuisXVI from '../LuisXVI';
 
 class Telegram {
   private static instance: Telegram;
@@ -67,6 +68,10 @@ class Telegram {
     if (!options) options = {};
     Object.assign(options, { disable_notification: true });
     this.sendDefault(msg, options);
+  }
+
+  public stopPolling(): void {
+    this.bot.stopPolling();
   }
 
   // Private implementations
