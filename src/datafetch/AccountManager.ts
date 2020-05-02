@@ -36,7 +36,7 @@ class AccountManager {
 
   async updateAccounts(): Promise<void> {
     try {
-      await this._page.waitForSelector(AccountManager.ACCOUNT_SELECTOR);
+      await this._page.waitForSelector(AccountManager.ACCOUNT_SELECTOR, { timeout: 2500 });
       console.log('getting user ids');
       const result = await this._page.$$eval(AccountManager.AVATAR_SELECTOR, (avatars) =>
         avatars.map((avatar) => avatar.getAttribute('alt'))
@@ -55,7 +55,9 @@ class AccountManager {
       this._accounts.push(new Account(accountName));
     }
 
-    console.log(`[AccountManager] using '${this._accounts}'`);
+    console.log(
+      `[AccountManager] accounts found: '${this._accounts.map((a) => a.name).join(', ')}'`
+    );
     return Promise.resolve();
   }
 }

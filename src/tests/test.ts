@@ -7,7 +7,7 @@ process.env.NTBA_FIX = '1';
 
 (async () => {
   const luisXVI: LuisXVI = new LuisXVI();
-  // await luisXVI.fetchData(24);
+  await luisXVI.fetchData(24);
   await luisXVI.crunch();
   Telegram.getInstance().stopPolling();
 })();

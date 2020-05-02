@@ -27,7 +27,10 @@ class LuisXVI {
 
     this._downloadManager.flush();
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--start-fullscreen']
+    });
     const page = (await browser.pages())[0];
     await page.setViewport(LuisXVI.VIEWPORT);
     await page.goto('https://www.twitter.com');
