@@ -6,6 +6,7 @@ class Telegram {
   private static instance: Telegram;
   private bot: Bot;
   private token: string;
+  private thisIsNotEnoughPizza: string;
 
   private constructor() {
     if (typeof process.env.telegram_token !== 'string') {
@@ -32,9 +33,11 @@ class Telegram {
       }
     });
 
-    if (process.env.telegram_chat_id) {
-      this.bot.sendMessage(process.env.telegram_chat_id, 'I am listening.');
+    if (process.env.thisIsNotEnoughPizza) {
+      this.thisIsNotEnoughPizza = process.env.thisIsNotEnoughPizza;
+      this.notifyWake();
     } else {
+      this.thisIsNotEnoughPizza = '';
       console.error("[Telegram] No default chat id is present in .env, can't notify start up.");
     }
   }
@@ -47,8 +50,28 @@ class Telegram {
     return Telegram.instance;
   }
 
-  public sendMessage(chatId: number, msg: string): void {
-    this.bot.sendMessage(chatId, msg);
+  public sendMessage(chatId: string | number, msg: string, options?: {}): void {
+    this.bot.sendMessage(chatId, msg, options);
+  }
+
+  public sendDefault(msg: string, options?: {}): void {
+    if (this.thisIsNotEnoughPizza === '') {
+      console.warn(
+        `[Telegram] Can't send to default chat because there is no default chat id defined`
+      );
+    }
+    this.sendMessage(this.thisIsNotEnoughPizza, msg, options);
+  }
+
+  public sendQuiet(msg: string, options?: {}): void {
+    if (!options) options = {};
+    Object.assign(options, { disable_notification: true });
+    this.sendDefault(msg, options);
+  }
+
+  // Private implementations
+  private notifyWake(): void {
+    this.bot.sendMessage(this.thisIsNotEnoughPizza, 'I am listening.');
   }
 }
 

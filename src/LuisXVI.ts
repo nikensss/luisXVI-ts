@@ -8,6 +8,8 @@ import Human from './datafetch/Human';
 import Account from './datafetch/Account';
 import CsvHandler from './analytics/CsvHandler';
 import Tweet from './analytics/Tweet';
+import KurtGodel from './analytics/KurtGodel';
+import Telegram from './utils/Telegram';
 
 class LuisXVI {
   private _downloadManager: DownloadManager;
@@ -46,23 +48,28 @@ class LuisXVI {
       await accountManager.updateAccounts();
     }
 
-    const human = new Human({ page: page, downloadPath: this._downloadManager.path });
+    const human = new Human({
+      page: page,
+      downloadPath: this._downloadManager.path
+    });
 
     let problematicPeriods: Array<{ name: string; value: string[] }> = [];
 
     for (let account of accountManager.accounts) {
-      //TODO: use generator method from AccountManager
       this.log(`starting csv downloads for ${account.name}`);
       await page.goto(account.link);
       human.page = page;
       await human.enableDownloads(this._downloadManager.path);
       await human.tweets();
       await human.downloadCurrentMonth();
-      problematicPeriods.push({ name: account.name, value: await human.downloadPreviousMonths(amount - 1) });
+      problematicPeriods.push({
+        name: account.name,
+        value: await human.downloadPreviousMonths(amount - 1)
+      });
       this.log(`finished downloading csv's for ${account.name}`);
     }
     this.log(JSON.stringify(problematicPeriods));
-
+    Telegram.getInstance().sendQuiet(JSON.stringify(problematicPeriods, null, 0));
     browser.close();
   }
 
@@ -72,6 +79,14 @@ class LuisXVI {
       .readdir(this._downloadManager.path)
       .then((files) => files.map((n) => path.join(this._downloadManager.path.toString(), n)));
     const tweets: Tweet[] = await CsvHandler.parseMultiple(csvPaths);
+    const kurt = new KurtGodel(tweets);
+    const impressions = kurt.monthlySum('likes');
+    console.log(impressions);
+    Telegram.getInstance().sendQuiet(`likes: ${JSON.stringify(impressions, null, ' ')}`);
+  }
+
+  public get downloadPath(): PathLike {
+    return this._downloadManager.path;
   }
 
   private log(msg: string): void {

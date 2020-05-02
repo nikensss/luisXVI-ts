@@ -9,7 +9,7 @@ class Tweet {
   private _tweetPermalink: string;
   private _tweetText: string;
   private _time: Moment;
-  private _impresions: number;
+  private _impressions: number;
   private _engagements: number;
   private _engagementRate: number;
   private _retweets: number;
@@ -27,6 +27,7 @@ class Tweet {
   private _dialPhone: string;
   private _mediaViews: number;
   private _mediaEngagements: number;
+
   // private _promotedPermalinkClicks: number;
   // private _promotedAppOpens: number;
   // private _ptomotedAppInstalls: number;
@@ -35,14 +36,15 @@ class Tweet {
   // private _promotedDialPhone: string;
   // private _promotedMediaViews: number;
   // private _promotedMediaEngagements: number;
+
   constructor(t: any) {
     this._tweet = t;
     this._id = t['Tweet id'];
     this._tweetPermalink = t['Tweet permalink'];
     this._user = this._tweetPermalink.split('/')[3];
     this._tweetText = t['Tweet text'];
-    this._time = moment(t['time']);
-    this._impresions = parseInt(t['impressions']);
+    this._time = moment(t['time'], 'YYYY-MM-DD HH:mm +HHmm');
+    this._impressions = parseInt(t['impressions']);
     this._engagements = parseInt(t['engagements']);
     this._engagementRate = parseFloat(t['engagement rate']);
     this._retweets = parseInt(t['retweets']);
@@ -66,8 +68,52 @@ class Tweet {
     return `User: ${this.user}; Time: ${this._time}; Text: ${this._tweetText}`;
   }
 
-  get user(): string {
+  public get user(): string {
     return this._user;
+  }
+
+  public get year(): number {
+    return this._time.year();
+  }
+
+  public get month(): number {
+    return this._time.month();
+  }
+
+  public get monthName(): string {
+    return this._time.format('MMMM');
+  }
+
+  public get date(): number {
+    return this._time.date();
+  }
+
+  public get day(): number {
+    return this._time.day();
+  }
+
+  public get likes(): number {
+    return this._likes;
+  }
+
+  public get impressions(): number {
+    return this._impressions;
+  }
+
+  public get(prop: string): string | number {
+    if (prop === 'likes') {
+      return this.likes;
+    }
+
+    if (prop === 'impressions') {
+      return this.impressions;
+    }
+
+    if (prop === 'user') {
+      return this.user;
+    }
+
+    throw new Error(`[Tweet] Unknown property "${prop}"`);
   }
 }
 
