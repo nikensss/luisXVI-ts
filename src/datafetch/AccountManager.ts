@@ -50,15 +50,17 @@ class AccountManager {
       if (!ex.message.includes('waiting for selector "ul.AccountSelector-accounts > li')) {
         throw ex;
       }
-      const url = this._page.url();
-      const accountName = url.replace(/.*\/user\/(.+)\/.*/, '$1');
-      this._accounts.push(new Account(accountName));
+      this.useCurrentAccount();
     }
 
-    console.log(
-      `[AccountManager] accounts found: '${this._accounts.map((a) => a.name).join(', ')}'`
-    );
+    console.log(`[AccountManager] accounts: '${this._accounts.map((a) => a.name).join(', ')}'`);
     return Promise.resolve();
+  }
+
+  private useCurrentAccount(): void {
+    const url = this._page.url();
+    const accountName = url.replace(/.*\/user\/(.+)\/.*/, '$1');
+    this._accounts.push(new Account(accountName));
   }
 }
 
