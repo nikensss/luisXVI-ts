@@ -8,7 +8,7 @@ import Human from './datafetch/Human';
 import Account from './datafetch/Account';
 import CsvHandler from './analytics/CsvHandler';
 import Tweet from './analytics/Tweet';
-import KurtGodel from './analytics/KurtGodel';
+import Euler from './analytics/Euler';
 import Telegram from './utils/Telegram';
 import ProblematicPeriods from './datafetch/interfaces/ProblematicPeriods';
 
@@ -70,10 +70,28 @@ class LuisXVI {
     this.log('crunching!');
     const csvPaths: PathLike[] = this._downloadManager.listDownloads();
     const tweets: Tweet[] = await CsvHandler.parseMultiple(csvPaths);
-    const kurt = new KurtGodel(tweets);
-    const impressions = kurt.monthlySum('likes');
-    console.log(impressions);
-    Telegram.getInstance().sendQuiet(`likes: ${JSON.stringify(impressions, null, ' ')}`);
+    const leonhard = new Euler(tweets);
+    // let monthlyTweets = leonhard.monthlySum('tweets');
+    // console.log('Monthly tweets', monthlyTweets);
+
+    // let results = leonhard.monthlySum('retweets');
+    // console.log('Monthly retweets', results);
+
+    // results = leonhard.monthlySum('likes');
+    // console.log('Monthly likes', results);
+
+    // results = leonhard.monthlySum('engagements');
+    // console.log('Monthly engagements', results);
+
+    // results = leonhard.monthlySum('impressions');
+    // console.log('Monthly impressions', results);
+
+    // results = leonhard.monthlyEngagementRate();
+    // console.log('Monthly engagement rate', results);
+
+    // Telegram.getInstance().sendQuiet(`likes: ${JSON.stringify(results, null, ' ')}`);
+
+    leonhard.sum('likes');
   }
 
   public get downloadPath(): PathLike {

@@ -9,6 +9,11 @@ class Tweet {
   private _tweetPermalink: string;
   private _tweetText: string;
   private _time: Moment;
+  private _semester: number;
+  private _quarter: number;
+  private _fortnight: number;
+  private _week: number;
+  private _monthName: string;
   private _impressions: number;
   private _engagements: number;
   private _engagementRate: number;
@@ -62,6 +67,13 @@ class Tweet {
     this._dialPhone = t['dial phone'];
     this._mediaViews = parseInt(t['media views']);
     this._mediaEngagements = parseInt(t['media engagements']);
+
+    //Feature engineering
+    this._semester = Math.trunc(this._time.month() / 6);
+    this._monthName = this._time.format('MMMM');
+    this._quarter = this._time.quarter() - 1;
+    this._fortnight = Math.trunc(this._time.dayOfYear() / 14);
+    this._week = this._time.week();
   }
 
   toString(): string {
@@ -76,12 +88,28 @@ class Tweet {
     return this._time.year();
   }
 
-  public get month(): number {
-    return this._time.month();
+  public get semester(): string {
+    return 'S' + this._semester;
+  }
+
+  public get quarter(): string {
+    return 'Q' + this._quarter;
+  }
+
+  public get month(): string {
+    return 'M' + this._time.month();
   }
 
   public get monthName(): string {
-    return this._time.format('MMMM');
+    return this._monthName;
+  }
+
+  public get fortnight(): string {
+    return 'F' + this._fortnight;
+  }
+
+  public get week(): string {
+    return 'W' + this._week;
   }
 
   public get date(): number {
@@ -100,20 +128,31 @@ class Tweet {
     return this._impressions;
   }
 
+  public get engagements(): number {
+    return this._engagements;
+  }
+
+  public get retweets(): number {
+    return this._retweets;
+  }
+
   public get(prop: string): string | number {
-    if (prop === 'likes') {
-      return this.likes;
+    switch (prop) {
+      case 'tweets':
+        return 1;
+      case 'likes':
+        return this.likes;
+      case 'impressions':
+        return this.impressions;
+      case 'user':
+        return this.user;
+      case 'engagements':
+        return this.engagements;
+      case 'retweets':
+        return this.retweets;
+      default:
+        throw new Error(`[Tweet] Unknown property "${prop}"`);
     }
-
-    if (prop === 'impressions') {
-      return this.impressions;
-    }
-
-    if (prop === 'user') {
-      return this.user;
-    }
-
-    throw new Error(`[Tweet] Unknown property "${prop}"`);
   }
 }
 

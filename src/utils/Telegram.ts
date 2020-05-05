@@ -1,7 +1,6 @@
 import { default as Bot } from 'node-telegram-bot-api';
 import { promises as fs } from 'fs';
 import path from 'path';
-import LuisXVI from '../LuisXVI';
 
 class Telegram {
   private static instance: Telegram;
@@ -34,8 +33,8 @@ class Telegram {
       }
     });
 
-    if (process.env.defaultChatId) {
-      this.defaultChatId = process.env.defaultChatId;
+    if (process.env.thisIsNotEnoughPizza) {
+      this.defaultChatId = process.env.thisIsNotEnoughPizza;
       this.notifyWake();
     } else {
       this.defaultChatId = '';
@@ -57,9 +56,7 @@ class Telegram {
 
   public sendDefault(msg: string, options?: {}): void {
     if (this.defaultChatId === '') {
-      console.warn(
-        `[Telegram] Can't send to default chat because there is no default chat id defined`
-      );
+      console.warn(`[Telegram] Can't send to default chat because there is no default chat id defined`);
     }
     this.sendMessage(this.defaultChatId, msg, options);
   }
@@ -76,7 +73,7 @@ class Telegram {
 
   // Private implementations
   private notifyWake(): void {
-    this.bot.sendMessage(this.defaultChatId, 'I am listening.');
+    this.sendQuiet('I am listening.');
   }
 }
 
