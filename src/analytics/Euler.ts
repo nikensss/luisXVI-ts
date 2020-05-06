@@ -4,7 +4,7 @@ import YearMonthTweets from './interfaces/YearMonthTweets';
 import YearMonthAggregation from './interfaces/YearMonthAggregation';
 
 /**
- * Kurt Gödel is responsible for the mathematic aggregations over each tweet feature
+ * The Euler is responsible for the mathematic aggregations over each tweet feature
  */
 class Euler {
   private _tweets: Tweet[];
@@ -14,51 +14,7 @@ class Euler {
 
   public sum(prop: string): any {
     const group: any = groupby(this._tweets, 'year', 'semester', 'quarter', 'monthName', 'fortnight', 'week', 'date');
-    const result: any = Object.assign(group);
-
-    const years = Object.keys(group);
-    years.forEach((y) => {
-      const semesters = Object.keys(group[y]);
-      semesters.forEach((s) => {
-        const quarters = Object.keys(group[y][s]);
-        quarters.forEach((q) => {
-          const months = Object.keys(group[y][s][q]);
-          months.forEach((m) => {
-            const fortnights = Object.keys(group[y][s][q][m]);
-            fortnights.forEach((f) => {
-              const weeks = Object.keys(group[y][s][q][m][f]);
-              weeks.forEach((w) => {
-                const dates = Object.keys(group[y][s][q][m][f][w]);
-                dates.forEach((d) => {
-                  console.log(group[y][s][q][m][f][w][d][0].constructor.name);
-                  result[y][s][q][m][f][w][d] = group[y][s][q][m][f][w][d].reduce(
-                    (t: any, c: any) => t + c.get(prop),
-                    0
-                  );
-                });
-              });
-            });
-          });
-        });
-      });
-    });
-    // const years = Object.keys(group);
-    // years.forEach((year) => {
-    //   const months = Object.keys(group[year]);
-    //   months.forEach((month) => {
-    //     if (!result[year]) result[year] = {};
-    //     if (!result[year][month]) result[year][month] = 0;
-
-    //     result[year][month] = group[year][month].reduce((t: number, c: Tweet) => {
-    //       if (typeof c.get(prop) !== 'number') {
-    //         throw new Error(`[Euler] Property ${prop} is not of type number. It is ${typeof c.get(prop)}`);
-    //       }
-    //       return t + <number>c.get(prop);
-    //     }, 0);
-    //   });
-    // });
-    // console.log(JSON.stringify(result, null, ' '));
-    return result;
+    return this.dive(group, (t: any, c: any) => t + c.get(prop), 0);
   }
 
   /**
@@ -108,64 +64,65 @@ class Euler {
 
     return result;
   }
+
+  //Private implementations
+
+  private dive(data: any, callback: (t: number, c: Tweet) => number, initialValue: number): any {
+    const r: any = {};
+
+    if (Array.isArray(data)) return data.reduce(callback, initialValue);
+
+    Object.keys(data).forEach((k) => (r[k] = this.dive(data[k], callback, initialValue)));
+
+    return r;
+  }
 }
 
 export default Euler;
 
 /*
-
-2020: {
-  'Gener': {
-    '1': 32,
-    '2': 12,
-    '31': 9
-  },
-  'Febrer': {
-    '3': 24
-  }
-}
-
-2020: {
-  'S0': {
-    'Q0':day´{
-      'January': {
-        'FIFTENTH0': {
-          'W0': {
-            '1': 0,
-            ...
-            '7': 0
+{
+  '2020': {
+    'S0': {
+      'Q0':day´{
+        'January': {
+          'FORTNIGHT0': {
+            'W0': {
+              '1': Tweet[],
+              ...
+              '7': Tweet[]
+            },
+            'W1': {
+              '8': Tweet[],
+              ...
+              '14': Tweet[]
+            }
           },
-          'W1': {
-            '8': 0,
-            ...
-            '14': 0
+          'FORTNIGHT1': {
+            'W3': {
+              '15': Tweet[],
+              ...
+              '21': Tweet[]
+            },
+            'W4': {
+              '22': Tweet[],
+              ...
+              '31': Tweet[]
+            }
           }
         },
-        'FIFTENTH1': {
-          'W3': {
-            '15': 0,
-            ...
-            '21': 0
-          },
-          'W4': {
-            '22': 0,
-            ...
-            '31': 0
-          }
+        'February': {
+        
         }
-      },
-      'February': {
-      
       }
-    }
 
-  
-  },
-  'S1': {
-  
+    
+    },
+    'S1': {
+    
+    }
   }
 }
-
 
 
 */

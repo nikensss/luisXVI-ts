@@ -6,9 +6,11 @@ const result = dotenv.config();
 if (result.error) {
   throw result.error;
 }
+process.env.NTBA_FIX = '1';
 
-const luisXVI = new LuisXVI();
-luisXVI.fetchData(4);
-luisXVI.crunch();
-
-Telegram.getInstance().stopPolling();
+(async () => {
+  const luisXVI: LuisXVI = new LuisXVI();
+  // await luisXVI.fetchData(24);
+  await luisXVI.crunch();
+  Telegram.getInstance().stopPolling();
+})();

@@ -91,7 +91,9 @@ class LuisXVI {
 
     // Telegram.getInstance().sendQuiet(`likes: ${JSON.stringify(results, null, ' ')}`);
 
-    leonhard.sum('likes');
+    let result = leonhard.sum('likes');
+    this.log('likes: \n' + JSON.stringify(result, null, 2));
+    this.log('finished with crunching!');
   }
 
   public get downloadPath(): PathLike {
