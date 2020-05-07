@@ -108,3 +108,4 @@ downloads
 #macOS system files
 
 .DS_Store
+*.pdf

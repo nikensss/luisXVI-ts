@@ -1,6 +1,10 @@
 import { default as Bot } from 'node-telegram-bot-api';
-import { promises as fs } from 'fs';
+import { promises as fs, PathLike } from 'fs';
 import path from 'path';
+import dotenv from 'dotenv';
+
+const result = dotenv.config();
+if (result.error) throw result.error;
 
 class Telegram {
   private static instance: Telegram;
@@ -52,6 +56,10 @@ class Telegram {
 
   public sendMessage(chatId: string | number, msg: string, options?: {}): void {
     this.bot.sendMessage(chatId, msg, options);
+  }
+
+  public sendDocument(path: string): void {
+    this.bot.sendDocument(this.defaultChatId, path);
   }
 
   public sendDefault(msg: string, options?: {}): void {
