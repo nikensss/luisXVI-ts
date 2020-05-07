@@ -3,6 +3,7 @@ const enum Period {
   SEMESTER = 'semester',
   QUARTER = 'quarter',
   MONTH = 'month',
+  MONTH_NAME = 'monthName',
   FORTNIGHT = 'fortnight',
   WEEK = 'week',
   DAY = 'day'

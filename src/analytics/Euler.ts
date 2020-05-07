@@ -2,6 +2,8 @@ import Tweet from './Tweet';
 import { default as groupby } from 'group-array';
 import YearMonthTweets from './interfaces/YearMonthTweets';
 import YearMonthAggregation from './interfaces/YearMonthAggregation';
+import PeriodAggregation from './interfaces/PeriodAggregation';
+import PeriodTweets from './interfaces/PeriodTweets';
 
 /**
  * The Euler is responsible for the mathematic aggregations over each tweet feature
@@ -10,11 +12,6 @@ class Euler {
   private _tweets: Tweet[];
   constructor(tweets: Tweet[]) {
     this._tweets = tweets;
-  }
-
-  public sum(prop: string): any {
-    const group: any = groupby(this._tweets, 'year', 'semester', 'quarter', 'monthName', 'fortnight', 'week', 'date');
-    return this.dive(group, (t: any, c: any) => t + c.get(prop), 0);
   }
 
   /**
@@ -65,10 +62,21 @@ class Euler {
     return result;
   }
 
+  public sum(prop: string): any {
+    const group: PeriodTweets = <PeriodTweets>(
+      groupby(this._tweets, 'year', 'semester', 'quarter', 'monthName', 'fortnight', 'week', 'date')
+    );
+    return this.dive(group, (t: any, c: any) => t + c.get(prop), 0);
+  }
+
   //Private implementations
 
-  private dive(data: any, callback: (t: number, c: Tweet) => number, initialValue: number): any {
-    const r: any = {};
+  private dive(
+    data: PeriodTweets | Tweet[],
+    callback: (t: number, c: Tweet) => number,
+    initialValue: number
+  ): PeriodAggregation | number {
+    const r: PeriodAggregation = {};
 
     if (Array.isArray(data)) return data.reduce(callback, initialValue);
 
