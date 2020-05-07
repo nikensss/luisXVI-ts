@@ -2,6 +2,9 @@ import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { promises as fs } from 'fs';
 import path from 'path';
 import Telegram from '../utils/Telegram';
+import dotenv from 'dotenv';
+
+const result = dotenv.config();
 
 async function createPdf() {
   const pdfDoc: PDFDocument = await PDFDocument.create();

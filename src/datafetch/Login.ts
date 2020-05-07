@@ -1,4 +1,8 @@
 import { Page } from 'puppeteer';
+import dotenv from 'dotenv';
+
+const result = dotenv.config();
+if (result.error) throw result.error;
 
 /**
  * Performs the login operation. Keeps trying until it works.

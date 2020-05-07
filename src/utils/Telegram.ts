@@ -1,10 +1,12 @@
 import { default as Bot } from 'node-telegram-bot-api';
-import { promises as fs, PathLike } from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 
 const result = dotenv.config();
 if (result.error) throw result.error;
+
+process.env.NTBA_FIX = '1';
 
 class Telegram {
   private static instance: Telegram;
@@ -37,8 +39,8 @@ class Telegram {
       }
     });
 
-    if (process.env.thisIsNotEnoughPizza) {
-      this.defaultChatId = process.env.thisIsNotEnoughPizza;
+    if (process.env.defaultChatId) {
+      this.defaultChatId = process.env.defaultChatId;
       this.notifyWake();
     } else {
       this.defaultChatId = '';
