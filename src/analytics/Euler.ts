@@ -1,9 +1,8 @@
 import Tweet from './Tweet';
 import { default as groupby } from 'group-array';
-import YearMonthTweets from './interfaces/YearMonthTweets';
-import YearMonthAggregation from './interfaces/YearMonthAggregation';
 import PeriodAggregation from './interfaces/PeriodAggregation';
 import PeriodTweets from './interfaces/PeriodTweets';
+import Period from './enums/Period';
 
 /**
  * The Euler is responsible for the mathematic aggregations over each tweet feature
@@ -14,60 +13,32 @@ class Euler {
     this._tweets = tweets;
   }
 
-  /**
-   * Calculates the total sum of the given property value for every month of
-   * every year.
-   *
-   * @param prop property to use for the summation
-   */
-  public monthlySum(prop: string): YearMonthAggregation {
-    const group: YearMonthTweets = <YearMonthTweets>groupby(this._tweets, 'year', 'monthName');
-    const result: YearMonthAggregation = <YearMonthAggregation>{};
+  public rate(propA: string, propB: string): PeriodAggregation {
+    const sumPropA: PeriodAggregation = this.sum(propA);
+    const sumPropB: PeriodAggregation = this.sum(propB);
 
-    const years = Object.keys(group);
-    years.forEach((year) => {
-      const months = Object.keys(group[year]);
-      months.forEach((month) => {
-        if (!result[year]) result[year] = {};
-        if (!result[year][month]) result[year][month] = 0;
-
-        result[year][month] = group[year][month].reduce((t: number, c: Tweet) => {
-          if (typeof c.get(prop) !== 'number') {
-            throw new Error(`[Euler] Property ${prop} is not of type number. It is ${typeof c.get(prop)}`);
-          }
-          return t + <number>c.get(prop);
-        }, 0);
-      });
-    });
-
-    return result;
+    return <PeriodAggregation>this.diveRate(sumPropA, sumPropB);
   }
 
-  public monthlyEngagementRate(): YearMonthAggregation {
-    const engagement = this.monthlySum('engagements');
-    const impressions = this.monthlySum('impressions');
-    const result: YearMonthAggregation = <YearMonthAggregation>{};
-
-    const years = Object.keys(engagement);
-    years.forEach((year) => {
-      const months = Object.keys(engagement[year]);
-      months.forEach((month) => {
-        if (!result[year]) result[year] = {};
-        if (!result[year][month]) result[year][month] = 0;
-
-        result[year][month] = engagement[year][month] / impressions[year][month];
-      });
-    });
-
-    return result;
-  }
-
-  public sum(prop: string): any {
+  public sum(prop: string): PeriodAggregation {
     const group: PeriodTweets = <PeriodTweets>(
-      groupby(this._tweets, 'year', 'semester', 'quarter', 'monthName', 'fortnight', 'week', 'date')
+      groupby(
+        this._tweets,
+        Period.YEAR,
+        Period.SEMESTER,
+        Period.QUARTER,
+        Period.MONTH_NAME,
+        Period.FORTNIGHT,
+        Period.WEEK,
+        Period.DATE
+      )
     );
-    return this.dive(group, (t: any, c: any) => t + c.get(prop), 0);
+    return <PeriodAggregation>this.dive(group, (t: any, c: any) => t + c.get(prop), 0);
   }
+
+  // public periodSum(period: Period, prop: string): PeriodAggregation{
+
+  // }
 
   //Private implementations
 
@@ -84,6 +55,16 @@ class Euler {
 
     return r;
   }
+
+  private diveRate(a: PeriodAggregation | number, b: PeriodAggregation | number): PeriodAggregation | number {
+    const r: PeriodAggregation = {};
+
+    if (typeof a === 'number' && typeof b === 'number') return a / b;
+
+    Object.keys(a).forEach((k) => (r[k] = this.diveRate(a, b)));
+
+    return r;
+  }
 }
 
 export default Euler;
@@ -92,7 +73,7 @@ export default Euler;
 {
   '2020': {
     'S0': {
-      'Q0':day´{
+      'Q0': {
         'January': {
           'FORTNIGHT0': {
             'W0': {
@@ -132,5 +113,10 @@ export default Euler;
   }
 }
 
+{
+  '2020': {
+    'January': Tweet[]
+  }
+}
 
 */

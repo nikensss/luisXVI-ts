@@ -6,7 +6,8 @@ const enum Period {
   MONTH_NAME = 'monthName',
   FORTNIGHT = 'fortnight',
   WEEK = 'week',
-  DAY = 'day'
+  DAY = 'day',
+  DATE = 'date'
 }
 
 export default Period;
