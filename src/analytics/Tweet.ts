@@ -1,6 +1,7 @@
 import moment, { Moment } from 'moment';
 /**
- *  This one convert each line of the csv into a Tweet object, where each attribute represents a tweet feature
+ * Represents a tweet and all the information related to it present in the csv
+ * file.
  */
 class Tweet {
   private _tweet: any;

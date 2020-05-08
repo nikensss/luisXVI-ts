@@ -33,16 +33,12 @@ class Euler {
         Period.DATE
       )
     );
-    return <PeriodAggregation>this.dive(group, (t: any, c: any) => t + c.get(prop), 0);
+    return <PeriodAggregation>this.diveReduce(group, (t: any, c: any) => t + c.get(prop), 0);
   }
-
-  // public periodSum(period: Period, prop: string): PeriodAggregation{
-
-  // }
 
   //Private implementations
 
-  private dive(
+  private diveReduce(
     data: PeriodTweets | Tweet[],
     callback: (t: number, c: Tweet) => number,
     initialValue: number
@@ -51,7 +47,7 @@ class Euler {
 
     if (Array.isArray(data)) return data.reduce(callback, initialValue);
 
-    Object.keys(data).forEach((k) => (r[k] = this.dive(data[k], callback, initialValue)));
+    Object.keys(data).forEach((k) => (r[k] = this.diveReduce(data[k], callback, initialValue)));
 
     return r;
   }
