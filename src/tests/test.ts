@@ -36,4 +36,10 @@ async function createPdf() {
   Telegram.getInstance().sendDocument(path.join(__dirname, 'newpdf.pdf'));
 }
 
-createPdf();
+// createPdf();
+
+function varArgs(...args: string[]) {
+  console.log(...args);
+}
+
+varArgs('first', 'second');

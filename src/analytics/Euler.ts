@@ -21,17 +21,15 @@ class Euler {
   }
 
   public sum(prop: string): PeriodAggregation {
-    const group: PeriodTweets = <PeriodTweets>(
-      groupby(
-        this._tweets,
-        Period.YEAR,
-        Period.SEMESTER,
-        Period.QUARTER,
-        Period.MONTH_NAME,
-        Period.FORTNIGHT,
-        Period.WEEK,
-        Period.DATE
-      )
+    const group: PeriodTweets = <PeriodTweets>groupby(
+      this._tweets,
+      Period.YEAR,
+      // Period.SEMESTER,
+      // Period.QUARTER,
+      Period.MONTH_NAME
+      // Period.FORTNIGHT,
+      // Period.WEEK,
+      // Period.DATE
     );
     return <PeriodAggregation>this.diveReduce(group, (t: any, c: any) => t + c.get(prop), 0);
   }
@@ -64,6 +62,20 @@ class Euler {
 }
 
 export default Euler;
+
+/*
+________________________________________________
+| Year  | Semester | Quarter | MonthName | Fortnight | Week | Day | Likes
+--------------------------------------------------------------------
+| 2020 | Febrer | W5      | 32  
+|               | W6      | 26
+|
+|
+
+
+
+
+*/
 
 /*
 {

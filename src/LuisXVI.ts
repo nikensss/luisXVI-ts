@@ -1,16 +1,16 @@
-import { promises as fs, PathLike } from 'fs';
+import { PathLike } from 'fs';
 import path from 'path';
 import puppeteer, { Viewport } from 'puppeteer';
 import DownloadManager from './datafetch/DownloadManager';
 import Login from './datafetch/Login';
 import AccountManager from './datafetch/AccountManager';
 import Human from './datafetch/Human';
-import Account from './datafetch/Account';
 import CsvHandler from './analytics/CsvHandler';
 import Tweet from './analytics/Tweet';
 import Euler from './analytics/Euler';
 import Telegram from './utils/Telegram';
 import ProblematicPeriods from './datafetch/interfaces/ProblematicPeriods';
+import PeriodAggregation from './analytics/interfaces/PeriodAggregation';
 
 class LuisXVI {
   private _downloadManager: DownloadManager;
@@ -66,34 +66,20 @@ class LuisXVI {
     browser.close();
   }
 
-  async crunch() {
+  async crunch(...metrics: string[]): Promise<PeriodAggregation[]> {
     this.log('crunching!');
     const csvPaths: PathLike[] = this._downloadManager.listDownloads();
     const tweets: Tweet[] = await CsvHandler.parseMultiple(csvPaths);
     const leonhard = new Euler(tweets);
-    // let monthlyTweets = leonhard.monthlySum('tweets');
-    // console.log('Monthly tweets', monthlyTweets);
+    const result: PeriodAggregation[] = [];
 
-    // let results = leonhard.monthlySum('retweets');
-    // console.log('Monthly retweets', results);
-
-    // results = leonhard.monthlySum('likes');
-    // console.log('Monthly likes', results);
-
-    // results = leonhard.monthlySum('engagements');
-    // console.log('Monthly engagements', results);
-
-    // results = leonhard.monthlySum('impressions');
-    // console.log('Monthly impressions', results);
-
-    // results = leonhard.monthlyEngagementRate();
-    // console.log('Monthly engagement rate', results);
-
-    // Telegram.getInstance().sendQuiet(`likes: ${JSON.stringify(results, null, ' ')}`);
-
-    let result = leonhard.sum('likes');
+    for (let metric of metrics) {
+      result.push(leonhard.sum(metric));
+    }
     this.log('likes: \n' + JSON.stringify(result, null, 2));
     this.log('finished with crunching!');
+
+    return result;
   }
 
   public get downloadPath(): PathLike {
