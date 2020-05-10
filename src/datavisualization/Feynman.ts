@@ -14,18 +14,14 @@ class Feynman {
     const spinner: Ora = ora({ text: 'exporting to HTML', prefixText: '[Feynmann]' }).start();
     let tableData = '';
 
-    for (let metric of data) {
-      let years = Object.keys(metric);
-      for (let year of years) {
-        tableData += `<tr>\n`;
-        let months = Object.keys(metric[year]);
-        tableData += `<td rowspan="${months.length}"> ${year} </td>\n`;
-        for (let month of months) {
-          tableData += `<td class='month'> ${month} </td>\n`;
-          let result: number = <number>(<PeriodAggregation>metric[year])[month];
-          tableData += `<td class='result'> ${result}</td>\n`;
-          tableData += `</tr>\n`;
-        }
+    let years = Object.keys(data[0]);
+    for (let year of years) {
+      tableData += `<tr>\n`;
+      let months = Object.keys(data[0][year]);
+      tableData += `<td rowspan="${months.length}" class="year"> ${year} </td>\n`;
+      for (let month of months) {
+        tableData += `<td class='month'> ${month} </td>\n`;
+        tableData += data.reduce((t, c) => `${t}<td class='result'> ${(<PeriodAggregation>c[year])[month]}</td>\n`, '');
         tableData += `</tr>\n`;
       }
     }

@@ -6,7 +6,7 @@ import Telegram from './utils/Telegram';
   const luisXVI: LuisXVI = new LuisXVI();
   // await luisXVI.fetchData(24);
 
-  const result = await luisXVI.crunch('likes');
+  const result = await luisXVI.crunch('tweets', 'likes');
 
   const richard: Feynmann = new Feynmann();
   richard.exportToHtml(result);
