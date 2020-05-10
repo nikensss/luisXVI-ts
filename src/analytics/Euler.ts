@@ -2,6 +2,7 @@ import Tweet from './Tweet';
 import { default as groupby } from 'group-array';
 import PeriodAggregation from './interfaces/PeriodAggregation';
 import PeriodTweets from './interfaces/PeriodTweets';
+import { default as PeriodTweetsClass } from './PeriodTweets';
 import Period from './enums/Period';
 
 /**
@@ -31,6 +32,8 @@ class Euler {
       // Period.WEEK,
       // Period.DATE
     );
+
+    const betterGroup = PeriodTweetsClass.fromAny(group, [Period.YEAR, Period.MONTH]);
     return <PeriodAggregation>this.diveReduce(group, (t: any, c: any) => t + c.get(prop), 0);
   }
 

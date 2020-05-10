@@ -37,10 +37,30 @@ async function createPdf() {
 }
 
 // createPdf();
+const t = {
+  '2020': {
+    January: {
+      W0: [1, 2, 3, 4],
+      W1: [5, 6, 7, 8]
+    },
+    February: {
+      W5: [9, 10, 11, 12, 13],
+      W7: [14, 15, 16, 17]
+    }
+  },
+  '2019': {
+    November: {
+      W45: [1, 2, 3, 4],
+      W46: [5, 6, 7, 8]
+    },
+    Decemeber: {
+      W51: [9, 10, 11, 12, 13],
+      W52: [14, 15, 16, 17]
+    }
+  }
+};
 
-function varArgs(...args: string[]) {
-  const [f, s] = args;
-  console.log(f, s);
-}
+const r = Object.entries(t).map((e) => [e[0], Object.entries(e[1]).map((f) => [f[0], Object.entries(f[1])])]);
 
-varArgs('first', 'second');
+console.log(JSON.stringify(r, null, 2));
+console.log(r);
