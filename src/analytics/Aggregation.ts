@@ -16,7 +16,7 @@ class Aggregation {
   }
 
   toHtmlTableData(): string {
-    return `<td><span class="p-2">${this.name}</span></td><td>${this.value}</td>`;
+    return `<tr><td><span class="p-2">${this.name}</span></td><td>${this.value}</td></tr>`;
   }
 }
 

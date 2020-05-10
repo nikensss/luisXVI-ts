@@ -31,7 +31,7 @@ class PeriodAggregation {
     if (this.data.every((d: PeriodAggregation | Aggregation) => d instanceof PeriodAggregation)) {
       guts += (<PeriodAggregation[]>this.data).map((d: PeriodAggregation) => d.toHtmlTableData()).join('\n');
     } else {
-      guts += (<Aggregation[]>this.data).map((d: Aggregation) => `<tr>${d.toHtmlTableData()}</tr>`).join('\n');
+      guts += (<Aggregation[]>this.data).map((d: Aggregation) => d.toHtmlTableData()).join('\n');
     }
 
     htmlTableData += `<td><span class="p-2">${this.name}</span></td><td><table>${guts}</table></td>\n`;
