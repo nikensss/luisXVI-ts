@@ -39,7 +39,8 @@ async function createPdf() {
 // createPdf();
 
 function varArgs(...args: string[]) {
-  console.log(...args);
+  const [f, s] = args;
+  console.log(f, s);
 }
 
 varArgs('first', 'second');

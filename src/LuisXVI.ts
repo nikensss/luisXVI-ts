@@ -62,7 +62,7 @@ class LuisXVI {
       this.log(`finished downloading csv's for ${account.name}`);
     }
     this.log(JSON.stringify(problematicPeriods));
-    Telegram.getInstance().sendQuiet(JSON.stringify(problematicPeriods, null, 0));
+    // Telegram.getInstance().sendQuiet(JSON.stringify(problematicPeriods, null, 0));
     browser.close();
   }
 
@@ -76,7 +76,7 @@ class LuisXVI {
     for (let metric of metrics) {
       result.push(leonhard.sum(metric));
     }
-    this.log('likes: \n' + JSON.stringify(result, null, 2));
+    // this.log('likes: \n' + JSON.stringify(result, null, 2));
     this.log('finished with crunching!');
 
     return result;

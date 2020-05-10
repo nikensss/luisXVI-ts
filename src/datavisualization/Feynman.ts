@@ -1,66 +1,44 @@
 import fs from 'fs';
 import path from 'path';
 import PeriodAggregation from '../analytics/interfaces/PeriodAggregation';
+import nunjucks, { Environment } from 'nunjucks';
+import ora, { Ora } from 'ora';
 
 class Feynman {
-  constructor() {}
+  private njk: Environment;
+  constructor() {
+    this.njk = nunjucks.configure(path.join(__dirname, 'views'), { autoescape: false });
+  }
 
   exportToHtml(data: PeriodAggregation[]) {
-    let html = `<G!ydoctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
-    <title>Hello, world!</title>
-    <style>
-      td {
-        padding: 0.3em;
-        text-align: center;
-      }
-
-      .month {
-        text-align: right;
-      }
-
-      .result {
-        text-align: left;
-      }
-
-    </style>
-  </head>
-  <body>
-  <div class="d-flex justify-content-center align-items-center bg-info vh-100 vw-100">
-  <table border='1' class="rounded m-3 bg-white">\n`;
+    const spinner: Ora = ora({ text: 'exporting to HTML', prefixText: '[Feynmann]' }).start();
+    let tableData = '';
 
     for (let metric of data) {
       let years = Object.keys(metric);
-      html += `<tr>\n`;
       for (let year of years) {
+        tableData += `<tr>\n`;
         let months = Object.keys(metric[year]);
-        html += `<td rowspan="${months.length}"> ${year} </td>\n`;
+        tableData += `<td rowspan="${months.length}"> ${year} </td>\n`;
         for (let month of months) {
-          html += `<td class='month'> ${month} </td>\n`;
+          tableData += `<td class='month'> ${month} </td>\n`;
           let result: number = <number>(<PeriodAggregation>metric[year])[month];
-          html += `<td class='result'> ${result}</td>\n`;
-          html += `</tr>\n`;
+          tableData += `<td class='result'> ${result}</td>\n`;
+          tableData += `</tr>\n`;
         }
+        tableData += `</tr>\n`;
       }
     }
-    html += `</table>
-    </div>
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-  </body>
-</html>`;
 
+    let html = this.njk.render('report.njk', { tableData: tableData });
     fs.writeFileSync(path.join(__dirname, 'reports', 'report.html'), html);
+    spinner.succeed('Successfully exported to HTML!');
+  }
+
+  //Private implementations
+
+  log(msg: string): void {
+    console.log(`[Feynmann] ${msg}`);
   }
 }
 
