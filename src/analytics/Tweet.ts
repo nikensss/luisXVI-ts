@@ -137,22 +137,35 @@ class Tweet {
     return this._retweets;
   }
 
+  public get replies(): number {
+    return this._replies;
+  }
+
   public get(prop: string): string | number {
     switch (prop) {
+      case 'user':
+        return this.user;
+      default:
+        return this.getMetric(prop);
+    }
+  }
+
+  public getMetric(metric: string): number {
+    switch (metric) {
       case 'tweets':
         return 1;
       case 'likes':
         return this.likes;
       case 'impressions':
         return this.impressions;
-      case 'user':
-        return this.user;
       case 'engagements':
         return this.engagements;
       case 'retweets':
         return this.retweets;
+      case 'replies':
+        return this.replies;
       default:
-        throw new Error(`[Tweet] Unknown property "${prop}"`);
+        throw new Error(`[Tweet] Unknown property "${metric}"`);
     }
   }
 }

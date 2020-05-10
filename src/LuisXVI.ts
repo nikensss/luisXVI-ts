@@ -10,7 +10,8 @@ import Tweet from './analytics/Tweet';
 import Euler from './analytics/Euler';
 import Telegram from './utils/Telegram';
 import ProblematicPeriods from './datafetch/interfaces/ProblematicPeriods';
-import PeriodAggregation from './analytics/interfaces/PeriodAggregation';
+import PeriodAggregation from './analytics/PeriodAggregation';
+import Period from './analytics/enums/Period';
 
 class LuisXVI {
   private _downloadManager: DownloadManager;
@@ -68,15 +69,14 @@ class LuisXVI {
 
   async crunch(...metrics: string[]): Promise<PeriodAggregation[]> {
     this.log('crunching!');
-    const csvPaths: PathLike[] = this._downloadManager.listDownloads();
-    const tweets: Tweet[] = await CsvHandler.parseMultiple(csvPaths);
-    const leonhard = new Euler(tweets);
-    const result: PeriodAggregation[] = [];
 
-    for (let metric of metrics) {
-      result.push(leonhard.sum(metric));
-    }
-    // this.log('likes: \n' + JSON.stringify(result, null, 2));
+    const csvPaths: PathLike[] = this._downloadManager.listDownloads();
+
+    const tweets: Tweet[] = await CsvHandler.parseMultiple(csvPaths);
+
+    const leonhard = new Euler(tweets);
+    let result: PeriodAggregation[] = leonhard.sum(metrics, Period.YEAR, Period.SEMESTER, Period.MONTH_NAME);
+
     this.log('finished with crunching!');
 
     return result;

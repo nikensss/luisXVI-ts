@@ -1,14 +1,14 @@
 import Period from './enums/Period';
-import Tweet from './Tweet';
+import Aggregation from './Aggregation';
 
 class PeriodAggregation {
   private _period: Period;
-  private _value: string;
-  private _data: PeriodAggregation[] | Tweet[];
+  private _name: string;
+  private _data: PeriodAggregation[] | Aggregation[];
 
-  constructor(period: Period, value: string, data: PeriodAggregation[] | Tweet[]) {
+  constructor(period: Period, name: string, data: PeriodAggregation[] | Aggregation[]) {
     this._period = period;
-    this._value = value;
+    this._name = name;
     this._data = data;
   }
 
@@ -16,27 +16,28 @@ class PeriodAggregation {
     return this._period;
   }
 
-  get value(): string {
-    return this._value;
+  get name(): string {
+    return this._name;
   }
 
-  get data(): PeriodAggregation[] | Tweet[] {
+  get data(): PeriodAggregation[] | Aggregation[] {
     return this._data;
   }
 
-  static fromAny(object: any, periods: Period[]): PeriodAggregation[] {
-    const result: PeriodAggregation[] = [];
-    const entries: [[string, any]] = <[[string, any]]>Object.entries(object);
+  toHtmlTableData(): string {
+    let htmlTableData: string = '<tr>\n';
+    let guts: string = '';
 
-    for (let entry of entries) {
-      if (Array.isArray(entry[1])) {
-        result.push(new PeriodAggregation(periods[0], entry[0], entry[1]));
-      } else {
-        result.push(new PeriodAggregation(periods[0], entry[0], PeriodAggregation.fromAny(entry[1], periods.slice(1))));
-      }
+    if (this.data.every((d: PeriodAggregation | Aggregation) => d instanceof PeriodAggregation)) {
+      guts += (<PeriodAggregation[]>this.data).map((d: PeriodAggregation) => d.toHtmlTableData()).join('\n');
+    } else {
+      guts += (<Aggregation[]>this.data).map((d: Aggregation) => `<tr>${d.toHtmlTableData()}</tr>`).join('\n');
     }
 
-    return result;
+    htmlTableData += `<td><span class="p-2">${this.name}</span></td><td><table>${guts}</table></td>\n`;
+
+    htmlTableData += '</tr>\n';
+    return htmlTableData;
   }
 }
 
