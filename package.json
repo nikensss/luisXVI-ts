@@ -29,6 +29,7 @@
     "moment": "^2.25.1",
     "neat-csv": "^5.2.0",
     "node-telegram-bot-api": "^0.40.0",
+    "nunjucks": "^3.2.1",
     "ora": "^4.0.4",
     "pdf-lib": "^1.5.0",
     "puppeteer": "^3.0.1"
