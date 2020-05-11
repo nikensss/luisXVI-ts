@@ -1,6 +1,6 @@
 import Period from './enums/Period';
 import Tweet from './Tweet';
-import PeriodAggregation from './PeriodAggregation';
+import PeriodAggregations from './PeriodAggregations';
 import Aggregation from './Aggregation';
 
 class PeriodTweets {
@@ -80,18 +80,22 @@ class PeriodTweets {
    * @param callback the reduction to apply
    * @param initialValue the initial value for the reduction
    */
-  reduce(metrics: string[], curry: any, initialValue: number = 0): PeriodAggregation {
+  sum(metrics: string[]): PeriodAggregations {
     if (this.data.every((t: any) => t instanceof Tweet)) {
-      const aggregations: Aggregation[] = metrics.map(
-        (m) => new Aggregation(m, (<Tweet[]>this.data).reduce(curry(m), initialValue))
-      );
-      return new PeriodAggregation(this.period, this.name, aggregations);
+      const aggregations: Aggregation[] = metrics.map((m) => new Aggregation(m));
+
+      (<Tweet[]>this.data).reduce((t: Aggregation[], c: Tweet) => {
+        t.forEach((a) => a.add(c.getMetric(a.name)));
+        return t;
+      }, aggregations);
+
+      return new PeriodAggregations(this.period, this.name, aggregations);
     }
 
-    return new PeriodAggregation(
+    return new PeriodAggregations(
       this.period,
       this.name,
-      (<PeriodTweets[]>this.data).map((d: PeriodTweets) => d.reduce(metrics, curry, initialValue))
+      (<PeriodTweets[]>this.data).map((d: PeriodTweets) => d.sum(metrics))
     );
   }
 }

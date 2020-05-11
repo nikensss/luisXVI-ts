@@ -1,5 +1,5 @@
 import { default as groupby } from 'group-array';
-import PeriodAggregation from './PeriodAggregation';
+import PeriodAggregations from './PeriodAggregations';
 import PeriodTweets from './PeriodTweets';
 import Period from './enums/Period';
 import Tweet from './Tweet';
@@ -21,11 +21,9 @@ class Euler {
   //   return <PeriodAggregation>this.diveRate(sumPropA, sumPropB);
   // }
 
-  public sum(metrics: string[], ...periods: Period[]): PeriodAggregation[] {
+  public sum(metrics: string[], periods: Period[]): PeriodAggregations[] {
     const periodsTweets: PeriodTweets[] = PeriodTweets.fromAny(groupby(this._tweets, ...periods), periods);
-    return periodsTweets.map((periodTweets) =>
-      periodTweets.reduce(metrics, (metric: string) => (t: number, c: Tweet) => t + c.getMetric(metric), 0)
-    );
+    return periodsTweets.map((periodTweets) => periodTweets.sum(metrics));
   }
 }
 

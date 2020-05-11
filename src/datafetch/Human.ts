@@ -62,7 +62,7 @@ class Human {
       if (!(await this.exportDataByTweet())) {
         console.log(`[Human] could not download csv for period ${await this.getDateRangeTitle()}`);
         await this._page.reload();
-        continue;
+        return Promise.resolve(false);
       }
       return Promise.resolve(true);
     }

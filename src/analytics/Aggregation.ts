@@ -1,8 +1,10 @@
-class Aggregation {
+import Table from './interfaces/Table';
+
+class Aggregation implements Table {
   private _name: string;
   private _value: number;
 
-  constructor(name: string, value: number) {
+  constructor(name: string, value: number = 0) {
     this._name = name;
     this._value = value;
   }
@@ -13,6 +15,10 @@ class Aggregation {
 
   get value(): number {
     return this._value;
+  }
+
+  add(n: number): void {
+    this._value += n;
   }
 
   toHtmlTableData(): string {
