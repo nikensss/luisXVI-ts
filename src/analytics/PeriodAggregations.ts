@@ -1,8 +1,8 @@
 import Period from './enums/Period';
 import Aggregation from './Aggregation';
-import Table from './interfaces/Table';
+import TableColumn from '../datavisualization/TableColumn';
 
-class PeriodAggregations implements Table {
+class PeriodAggregations {
   private _period: Period;
   private _name: string;
   private _data: PeriodAggregations[] | Aggregation[];
@@ -33,27 +33,12 @@ class PeriodAggregations implements Table {
     return (<PeriodAggregations[]>this.data).reduce((t, c) => t + c.totalSpan(), 0);
   }
 
-  periodTree(): string | any[] {
+  toTableColumn(): TableColumn {
     if (this.data.every((d: any) => d instanceof Aggregation)) {
-      return `<td>${this.name}</td>`;
+      return new TableColumn(this.name, 1);
     }
 
-    let periodNames: any[] = [
-      `<td colspan="${this.totalSpan()}">${this.name}</td>`,
-      (<PeriodAggregations[]>this.data).map((p) => p.periodTree())
-    ];
-
-    return periodNames;
-  }
-
-  toHtmlTableData(): string {
-    let htmlTableData: string = '<tr>\n';
-    let guts: string = (<Table[]>this.data).map((d: Table) => d.toHtmlTableData()).join('\n');
-
-    htmlTableData += `<td><span class="p-2">${this.name}</span></td><td><table>${guts}</table></td>\n`;
-
-    htmlTableData += '</tr>\n';
-    return htmlTableData;
+    return new TableColumn(this.name, this.totalSpan(), <PeriodAggregations[]>this.data);
   }
 }
 

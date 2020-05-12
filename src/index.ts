@@ -10,7 +10,7 @@ import Period from './analytics/enums/Period';
   // await luisXVI.fetchData(24);
 
   const metrics: Metric[] = [Metric.TWEETS, Metric.LIKES, Metric.RETWEETS];
-  const periods: Period[] = [Period.YEAR, Period.SEMESTER, Period.MONTH_NAME];
+  const periods: Period[] = [Period.YEAR, Period.SEMESTER, Period.QUARTER, Period.MONTH_NAME];
   const result: PeriodAggregations[] = await luisXVI.crunch({ metrics, periods });
 
   const richard: Feynmann = new Feynmann();

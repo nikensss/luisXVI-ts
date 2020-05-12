@@ -1,6 +1,4 @@
-import Table from './interfaces/Table';
-
-class Aggregation implements Table {
+class Aggregation {
   private _name: string;
   private _value: number;
 
@@ -19,10 +17,6 @@ class Aggregation implements Table {
 
   add(n: number): void {
     this._value += n;
-  }
-
-  toHtmlTableData(): string {
-    return `<tr><td><span class="p-2">${this.name}</span></td><td>${this.value}</td></tr>`;
   }
 }
 
