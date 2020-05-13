@@ -16,13 +16,15 @@ class Visualizer {
   }
 
   exportToHtml(periods: PeriodAggregations[]) {
-    const spinner: Ora = ora({ text: 'exporting to HTML', prefixText: '[Feynmann]' }).start();
+    // const spinner: Ora = ora({ text: 'exporting to HTML', prefixText: '[Feynmann]' }).start();
+    this.log('exporting to html');
     const tableBody = new TableBuilder(periods);
     const table = `<table class="rounded m-3 bg-white">\n${tableBody.build('Metrics')}</table>`;
     const html = this.njk.render('report.njk', { table });
 
     fs.writeFileSync(path.join(__dirname, 'reports', 'report.html'), html);
-    spinner.succeed('Successfully exported to HTML!');
+    this.log('successfuly exported the HTML');
+    // spinner.succeed('Successfully exported to HTML!');
   }
 
   //Private implementations

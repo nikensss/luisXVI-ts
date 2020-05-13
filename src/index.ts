@@ -9,7 +9,7 @@ import Period from './analytics/enums/Period';
   const luisXVI: LuisXVI = new LuisXVI();
   // await luisXVI.fetchData(24);
 
-  const metrics: Metric[] = [Metric.TWEETS, Metric.LIKES, Metric.RETWEETS];
+  const metrics: Metric[] = [Metric.TWEETS, Metric.LIKES, Metric.RETWEETS, Metric.REPLIES];
   const periods: Period[] = [Period.YEAR, Period.SEMESTER, Period.QUARTER, Period.MONTH_NAME];
   const result: PeriodAggregations[] = await luisXVI.crunch({ metrics, periods });
 

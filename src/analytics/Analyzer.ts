@@ -14,6 +14,7 @@ class Analyzer {
     this._tweets = tweets;
   }
 
+  //TODO: implement
   // public rate(propA: string, propB: string): PeriodAggregation {
   //   const sumPropA: PeriodAggregation = this.sum(propA);
   //   const sumPropB: PeriodAggregation = this.sum(propB);

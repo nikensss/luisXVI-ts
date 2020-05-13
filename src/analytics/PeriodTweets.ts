@@ -63,6 +63,7 @@ class PeriodTweets {
     const result: PeriodTweets[] = [];
     const entries: [[string, any]] = <[[string, any]]>Object.entries(object);
 
+    //TODO: use better names for entry[0] and entry[1]
     for (let entry of entries) {
       if (Array.isArray(entry[1])) {
         result.push(new PeriodTweets(periods[0], entry[0], entry[1]));
