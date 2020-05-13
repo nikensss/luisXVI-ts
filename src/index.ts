@@ -1,5 +1,5 @@
 import LuisXVI from './LuisXVI';
-import Feynmann from './datavisualization/Feynman';
+import Feynmann from './datavisualization/Visualizer';
 import Telegram from './utils/Telegram';
 import PeriodAggregations from './analytics/PeriodAggregations';
 import Metric from './analytics/enums/Metric';
