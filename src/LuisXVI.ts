@@ -7,7 +7,7 @@ import AccountManager from './datafetch/AccountManager';
 import Human from './datafetch/Human';
 import CsvHandler from './analytics/CsvHandler';
 import Tweet from './analytics/Tweet';
-import Euler from './analytics/Euler';
+import Analyzer from './analytics/Analyzer';
 import Telegram from './utils/Telegram';
 import ProblematicPeriods from './datafetch/interfaces/ProblematicPeriods';
 import PeriodAggregations from './analytics/PeriodAggregations';
@@ -73,7 +73,7 @@ class LuisXVI {
 
     const csvPaths: PathLike[] = this._downloadManager.listDownloads();
     const tweets: Tweet[] = await CsvHandler.parseMultiple(csvPaths);
-    const leonhard = new Euler(tweets);
+    const leonhard = new Analyzer(tweets);
     let result: PeriodAggregations[] = leonhard.sum(metrics, periods);
 
     this.log('finished with crunching!');

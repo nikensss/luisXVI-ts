@@ -25,20 +25,60 @@ class PeriodAggregations {
     return this._data;
   }
 
-  totalSpan(): number {
-    if (this.data.every((d: any) => d instanceof Aggregation)) {
-      return 1;
-    }
+  get aggregations(): Aggregation[] {
+    if (this.hasAggregations()) return this.data as Aggregation[];
 
-    return (<PeriodAggregations[]>this.data).reduce((t, c) => t + c.totalSpan(), 0);
+    throw new Error('[PeriodAggregations] Data is not Aggregationp[]!');
+  }
+
+  get periodAggregations(): PeriodAggregations[] {
+    if (this.hasPeriodAggregations()) return this.data as PeriodAggregations[];
+
+    throw new Error('[PeriodAggregations] Data is not PeriodAggregations[]!');
+  }
+
+  hasAggregations(): boolean {
+    return this.data.every((d: PeriodAggregations | Aggregation) => d instanceof Aggregation);
+  }
+
+  hasPeriodAggregations(): boolean {
+    return this.data.every((d: PeriodAggregations | Aggregation) => d instanceof PeriodAggregations);
+  }
+
+  totalSpan(): number {
+    if (this.hasAggregations()) return 1;
+
+    return this.periodAggregations.reduce((t, c) => t + c.totalSpan(), 0);
   }
 
   toTableColumn(): TableColumn {
-    if (this.data.every((d: any) => d instanceof Aggregation)) {
+    if (this.hasAggregations()) {
       return new TableColumn(this.name, 1);
+    } else if (this.hasPeriodAggregations()) {
+      return new TableColumn(this.name, this.totalSpan(), this.periodAggregations);
     }
 
-    return new TableColumn(this.name, this.totalSpan(), <PeriodAggregations[]>this.data);
+    throw new Error('[PeriodAggregations] Illegal State! Check type of elements in this.data!');
+  }
+
+  getAggregatedMetricNames(): Set<string> {
+    if (this.data.length === 0) throw new Error('No metric has been aggregated!');
+
+    if (this.hasAggregations()) {
+      return new Set<string>(this.aggregations.map((a) => a.name));
+    }
+
+    return new Set<string>(this.periodAggregations.map((p) => [...p.getAggregatedMetricNames()]).flat());
+  }
+
+  getAggregatedMetric(metric: string): number[] {
+    if (this.data.length === 0) throw new Error('No metric has been aggregated!');
+
+    if (this.hasAggregations()) {
+      return this.aggregations.filter((a) => a.name === metric).map((a) => a.value);
+    }
+
+    return this.periodAggregations.map((p) => p.getAggregatedMetric(metric)).flat();
   }
 }
 

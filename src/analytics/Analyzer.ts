@@ -5,15 +5,16 @@ import Period from './enums/Period';
 import Tweet from './Tweet';
 
 /**
- * Mr Leonhard Euler is responsible for the mathematic
+ * The Analyzer class is responsible for the mathematic
  * aggregations over each tweet metric.
  */
-class Euler {
+class Analyzer {
   private _tweets: Tweet[];
   constructor(tweets: Tweet[]) {
     this._tweets = tweets;
   }
 
+  //TODO: implement
   // public rate(propA: string, propB: string): PeriodAggregation {
   //   const sumPropA: PeriodAggregation = this.sum(propA);
   //   const sumPropB: PeriodAggregation = this.sum(propB);
@@ -27,4 +28,4 @@ class Euler {
   }
 }
 
-export default Euler;
+export default Analyzer;
