@@ -5,33 +5,33 @@ import path from 'path';
  * Knows where files are downloaded to and can delete all downloaded files.
  */
 class DownloadManager {
-  private _downloadPath: PathLike;
+  private _downloadsPath: PathLike;
 
   constructor(downloadPath: PathLike) {
-    this._downloadPath = downloadPath;
-    if (!fs.existsSync(this.path)) {
-      this.log(`directory '${this.path}' doesn't exist, creating...`);
-      fs.mkdirSync(this.path);
+    this._downloadsPath = downloadPath;
+    if (!fs.existsSync(this.dir)) {
+      this.log(`directory '${this.dir}' doesn't exist, creating...`);
+      fs.mkdirSync(this.dir);
       this.log('creation successful!');
     }
   }
 
-  public get path(): PathLike {
-    return this._downloadPath;
+  public get dir(): PathLike {
+    return this._downloadsPath;
   }
 
   /**
    * Deletes all the files in the
    */
   public flush() {
-    fs.readdirSync(this.path).forEach((f) => {
+    fs.readdirSync(this.dir).forEach((f) => {
       this.log(`deleting ${f}`);
-      fs.unlinkSync(path.join(this.path.toString(), f));
+      fs.unlinkSync(path.join(this.dir.toString(), f));
     });
   }
 
   public listDownloads(): PathLike[] {
-    return fs.readdirSync(this.path).map((n) => path.join(this.path.toString(), n));
+    return fs.readdirSync(this.dir).map((n) => path.join(this.dir.toString(), n));
   }
 
   //Private implementations

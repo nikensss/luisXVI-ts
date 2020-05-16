@@ -47,14 +47,14 @@ class LuisXVI {
 
     const human = new Human({
       page: page,
-      downloadPath: this._downloadManager.path
+      downloadPath: this._downloadManager.dir
     });
     let problematicPeriods: ProblematicPeriods[] = [];
 
     for (let account of accountManager.accounts) {
       this.log(`starting csv downloads for ${account.name}`);
       await human.page.goto(account.link);
-      await human.enableDownloads(this._downloadManager.path);
+      await human.enableDownloads(this._downloadManager.dir);
       await human.goToTweets();
       await human.downloadCurrentMonth();
       problematicPeriods.push({
@@ -81,7 +81,7 @@ class LuisXVI {
   }
 
   public get downloadPath(): PathLike {
-    return this._downloadManager.path;
+    return this._downloadManager.dir;
   }
 
   //Private implementations
