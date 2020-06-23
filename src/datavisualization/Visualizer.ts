@@ -2,7 +2,6 @@ import fs, { PathLike } from 'fs';
 import path from 'path';
 import PeriodAggregations from '../analytics/PeriodAggregations';
 import nunjucks, { Environment } from 'nunjucks';
-import ora, { Ora } from 'ora';
 import TableBuilder from './TableBuilder';
 
 /**
@@ -11,29 +10,41 @@ import TableBuilder from './TableBuilder';
  */
 class Visualizer {
   private njk: Environment;
+
   constructor() {
     this.njk = nunjucks.configure(path.join(__dirname, 'views'), {
       autoescape: false
     });
   }
 
-  exportToHtml(periods: PeriodAggregations[]) {
+  export(periods: PeriodAggregations[]) {
+    const html = this.asHtml(periods);
+    this.exportToPdf(html);
+  }
+
+  //Private implementations
+
+  private exportToPdf(html: string): void {
+    //const pdf = convertToPdf(html);
+
+    //fs.writeFileSync(path.join(__dirname, 'reports', 'report.pdf'), pdf);
+    this.log('successfuly exported the PDF');
+  }
+  /**
+   * Convert this array of period aggregations to an HTML table. Gives nice
+   * formatting and stuff.
+   *
+   * @param periods array of period aggregations to summarize
+   */
+  private asHtml(periods: PeriodAggregations[]) {
     // const spinner: Ora = ora({ text: 'exporting to HTML', prefixText: '[Feynmann]' }).start();
     this.log('exporting to html');
     const tableBody = new TableBuilder(periods);
     const table = `<table class="rounded m-3 bg-white">\n${tableBody.build(
       'Metrics'
     )}</table>`;
-    const html = this.njk.render('report.njk', { table });
-
-    fs.writeFileSync(path.join(__dirname, 'reports', 'report.html'), html);
-    this.log('successfuly exported the HTML');
-    // spinner.succeed('Successfully exported to HTML!');
+    return this.njk.render('report.njk', { table });
   }
-
-  exportToPDF(htmlPath: PathLike);
-
-  //Private implementations
 
   log(msg: string): void {
     console.log(`[Feynmann] ${msg}`);
