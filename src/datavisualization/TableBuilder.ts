@@ -24,14 +24,14 @@ class TableBuilder {
 
   private header(prefixCell: string = ''): string {
     let depth = 0;
-    let cols = this._periods.map((p) => p.toTableColumn());
+    let cols = this._periods.map(p => p.toTableColumn());
     let r: string = '';
 
-    r += cols.map((c) => c.head()).join('') + '</tr>';
+    r += cols.map(c => c.head()).join('') + '</tr>';
     depth += 1;
-    while (cols.every((c) => c.hasTail())) {
-      cols = cols.map((c) => c.tail()).flat();
-      r += '<tr>' + cols.map((c) => c.head()).join('') + '</tr>';
+    while (cols.every(c => c.hasTail())) {
+      cols = cols.map(c => c.tail()).flat();
+      r += '<tr>' + cols.map(c => c.head()).join('') + '</tr>';
       depth += 1;
     }
 
@@ -39,7 +39,11 @@ class TableBuilder {
   }
 
   private body(): string {
-    const metrics: string[] = [...new Set<string>(this._periods.map((p) => [...p.getAggregatedMetricNames()]).flat())];
+    const metrics: string[] = [
+      ...new Set<string>(
+        this._periods.map(p => [...p.getAggregatedMetricNames()]).flat()
+      )
+    ];
 
     console.log('[TableBuilder] metrics found', metrics);
 
@@ -51,13 +55,13 @@ class TableBuilder {
     return metrics.reduce((t: string, c: string) => {
       //start the row for this metric
       t += '<tr>\n';
-      //add the name of this matric at the beginning of the row
+      //add the name of this metric at the beginning of the row
       t += `<td class='first-column metric-name'>${c}</td>`;
-      //add each of the values of this metric for each diaggregated period
+      //add each of the values of this metric for each disaggregated period
       t += `${this._periods
-        .map((p) => p.getAggregatedMetric(c))
+        .map(p => p.getAggregatedMetric(c))
         .flat()
-        .map((n) => `<td>${n}</td>`)
+        .map(n => `<td>${n}</td>`)
         .join('')}`;
       //end the row
       t += '\n</tr>';
