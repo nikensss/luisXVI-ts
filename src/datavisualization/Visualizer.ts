@@ -3,7 +3,7 @@ import path from 'path';
 import PeriodAggregations from '../analytics/PeriodAggregations';
 import nunjucks, { Environment } from 'nunjucks';
 import TableBuilder from './TableBuilder';
-
+import HTMLToPDF from 'convert-html-to-pdf';
 /**
  * The Visualizer helps visualizing all the data in neat HTML tables.
  * It should also be able to generate a PDF out of the HTML output.
@@ -24,10 +24,10 @@ class Visualizer {
 
   //Private implementations
 
-  private exportToPdf(html: string): void {
-    //const pdf = convertToPdf(html);
-
-    //fs.writeFileSync(path.join(__dirname, 'reports', 'report.pdf'), pdf);
+  private async exportToPdf(html: string): Promise<void> {
+    const pdf = new HTMLToPDF(html);
+    const buffer = await pdf.convert();
+    fs.writeFileSync(path.join(__dirname, 'reports', 'report.pdf'), buffer);
     this.log('successfuly exported the PDF');
   }
   /**

@@ -15,13 +15,18 @@ import Period from './analytics/enums/Period';
     Metric.RETWEETS,
     Metric.REPLIES
   ];
-  const periods: Period[] = [Period.YEAR, Period.SEMESTER, Period.QUARTER];
+  const periods: Period[] = [
+    Period.YEAR,
+    Period.SEMESTER,
+    Period.QUARTER,
+    Period.MONTH
+  ];
   const result: PeriodAggregations[] = await luisXVI.crunch({
     metrics,
     periods
   });
 
   const richard: Feynmann = new Feynmann();
-  richard.exportToHtml(result);
+  richard.export(result);
   // Telegram.getInstance().stopPolling();
 })();
