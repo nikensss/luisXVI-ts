@@ -17,7 +17,10 @@ import Metric from './analytics/enums/Metric';
 class LuisXVI {
   private _downloadManager: DownloadManager;
 
-  private static readonly DOWNLOAD_PATH: PathLike = path.join(__dirname, 'downloads');
+  private static readonly DOWNLOAD_PATH: PathLike = path.join(
+    __dirname,
+    'downloads'
+  );
   private static readonly VIEWPORT: Viewport = { width: 1600, height: 800 };
 
   constructor() {
@@ -25,12 +28,15 @@ class LuisXVI {
   }
 
   async fetchData(amount: number): Promise<void> {
-    if (amount <= 0) throw new Error(`Given amount must be greater than 0, received: ${amount}`);
+    if (amount <= 0)
+      throw new Error(
+        `Given amount must be greater than 0, received: ${amount}`
+      );
 
     this._downloadManager.flush();
 
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       args: ['--start-fullscreen']
     });
     const page = (await browser.pages())[0];
@@ -68,7 +74,13 @@ class LuisXVI {
     browser.close();
   }
 
-  async crunch({ metrics, periods }: { metrics: Metric[]; periods: Period[] }): Promise<PeriodAggregations[]> {
+  async crunch({
+    metrics,
+    periods
+  }: {
+    metrics: Metric[];
+    periods: Period[];
+  }): Promise<PeriodAggregations[]> {
     this.log('crunching!');
 
     const csvPaths: PathLike[] = this._downloadManager.listDownloads();
