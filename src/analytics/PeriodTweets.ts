@@ -64,11 +64,19 @@ class PeriodTweets {
     const entries: [[string, any]] = <[[string, any]]>Object.entries(object);
 
     //TODO: use better names for entry[0] and entry[1]
+    //entry[0]: period name
+    //entry[1]: object{[period: object]} | Tweet[]
     for (let entry of entries) {
       if (Array.isArray(entry[1])) {
         result.push(new PeriodTweets(periods[0], entry[0], entry[1]));
       } else {
-        result.push(new PeriodTweets(periods[0], entry[0], PeriodTweets.fromAny(entry[1], periods.slice(1))));
+        result.push(
+          new PeriodTweets(
+            periods[0],
+            entry[0],
+            PeriodTweets.fromAny(entry[1], periods.slice(1))
+          )
+        );
       }
     }
 
@@ -83,10 +91,10 @@ class PeriodTweets {
    */
   sum(metrics: string[]): PeriodAggregations {
     if (this.data.every((t: any) => t instanceof Tweet)) {
-      const aggregations: Aggregation[] = metrics.map((m) => new Aggregation(m));
+      const aggregations: Aggregation[] = metrics.map(m => new Aggregation(m));
 
       (<Tweet[]>this.data).reduce((t: Aggregation[], c: Tweet) => {
-        t.forEach((a) => a.add(c.getMetric(a.name)));
+        t.forEach(a => a.add(c.getMetric(a.name)));
         return t;
       }, aggregations);
 

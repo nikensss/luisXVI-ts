@@ -1,5 +1,4 @@
 import PeriodAggregations from '../analytics/PeriodAggregations';
-import Aggregation from '../analytics/Aggregation';
 
 class TableColumn {
   private _name: string;
@@ -9,7 +8,7 @@ class TableColumn {
   constructor(name: string, span: number, data: PeriodAggregations[] = []) {
     this._name = name;
     this._span = span;
-    this._data = data.map((p: PeriodAggregations) => p.toTableColumn()) as TableColumn[];
+    this._data = data.map((p: PeriodAggregations) => p.toTableColumn());
   }
 
   head(): string {
