@@ -21,17 +21,17 @@ class DownloadManager {
   }
 
   /**
-   * Deletes all the files in the
+   * Deletes all the files in the set download path.
    */
   public flush() {
-    fs.readdirSync(this.dir).forEach((f) => {
+    fs.readdirSync(this.dir).forEach(f => {
       this.log(`deleting ${f}`);
       fs.unlinkSync(path.join(this.dir.toString(), f));
     });
   }
 
   public listDownloads(): PathLike[] {
-    return fs.readdirSync(this.dir).map((n) => path.join(this.dir.toString(), n));
+    return fs.readdirSync(this.dir).map(n => path.join(this.dir.toString(), n));
   }
 
   //Private implementations

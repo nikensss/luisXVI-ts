@@ -1,66 +1,42 @@
 import { Page } from 'puppeteer';
-import dotenv from 'dotenv';
-
-const result = dotenv.config();
-if (result.error) throw result.error;
 
 /**
- * Performs the login operation. Keeps trying until it works.
+ * Performs the login operation on the given page. Tries 30 times before
+ * rejecting the login promise.
  */
 class Login {
   private _page: Page;
-  private _user: string;
-  private _pass: string;
 
-  private static readonly USERNAME_INPUT_SELECTOR: string = 'input[name="session[username_or_email]"]';
-  private static readonly PASSWORD_INPUT_SELECTOR: string = 'input[name="session[password]"]';
-  private static readonly LOGIN_BUTTON_SELECTOR: string = 'div[data-testid="LoginForm_Login_Button"]';
+  private static readonly USERNAME_INPUT_SELECTOR: string =
+    'input[name="session[username_or_email]"]';
+  private static readonly PASSWORD_INPUT_SELECTOR: string =
+    'input[name="session[password]"]';
+  private static readonly LOGIN_BUTTON_SELECTOR: string =
+    'div[data-testid="LoginForm_Login_Button"]';
 
   constructor(page: Page) {
-    if (typeof process.env.user !== 'string' || typeof process.env.pass !== 'string') {
-      throw new Error("Please, define 'user' and 'pass' in .env file.");
-    }
-
     this._page = page;
-    this._user = process.env.user;
-    this._pass = process.env.pass;
   }
 
-  public get user(): string {
-    return this._user;
-  }
-
-  public async login(): Promise<void> {
+  public async login(username: string, password: string): Promise<void> {
     let tries = 0;
-    while (true) {
+    while (tries < 30) {
       try {
-        this.log('waiting for username input');
-        await this._page.waitForSelector(Login.USERNAME_INPUT_SELECTOR);
-        this.log('entering username');
-        await this._page.click(Login.USERNAME_INPUT_SELECTOR);
-        await this._page.keyboard.type(this._user);
-
-        this.log('waiting for password input');
-        await this._page.waitForSelector(Login.PASSWORD_INPUT_SELECTOR);
-        this.log(`entering password`);
-        await this._page.click(Login.PASSWORD_INPUT_SELECTOR);
-        await this._page.keyboard.type(this._pass);
-
-        this.log('waiting for login button');
-        await this._page.waitForSelector(Login.LOGIN_BUTTON_SELECTOR);
-        this.log('clicking login button');
-        await this._page.click(Login.LOGIN_BUTTON_SELECTOR);
-
+        await this.inputUsername(username);
+        await this.inputPassword(password);
+        await this.clickLogin();
         return Promise.resolve();
       } catch (ex) {
         tries += 1;
         this.logError('exception while trying to login', ex);
-        if (tries > 30) throw new Error('Cannot log in!');
         if (tries % 5 === 0) this._page.reload();
         this.log('trying again');
       }
     }
+    return Promise.reject('Cannot log in!');
   }
+
+  //Private implementations
 
   private log(msg: string) {
     console.log(`[Login] ${msg}`);
@@ -69,6 +45,29 @@ class Login {
   private logError(msg: string, ex: Error) {
     this.log(msg);
     this.log(ex.message);
+  }
+
+  private async inputField(selector: string, value: string): Promise<void> {
+    await this._page.waitForSelector(selector);
+    await this._page.click(selector);
+    await this._page.keyboard.type(value);
+  }
+
+  private async inputUsername(username: string): Promise<void> {
+    this.log('waiting for username input');
+    await this.inputField(Login.USERNAME_INPUT_SELECTOR, username);
+  }
+
+  private async inputPassword(password: string): Promise<void> {
+    this.log('waiting for password input');
+    await this.inputField(Login.PASSWORD_INPUT_SELECTOR, password);
+  }
+
+  private async clickLogin(): Promise<void> {
+    this.log('waiting for login button');
+    await this._page.waitForSelector(Login.LOGIN_BUTTON_SELECTOR);
+    this.log('clicking login button');
+    await this._page.click(Login.LOGIN_BUTTON_SELECTOR);
   }
 }
 

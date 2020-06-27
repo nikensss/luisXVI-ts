@@ -43,8 +43,15 @@ class LuisXVI {
     await page.setViewport(LuisXVI.VIEWPORT);
     await page.goto('https://www.twitter.com');
 
+    if (
+      typeof process.env.user !== 'string' ||
+      typeof process.env.pass !== 'string'
+    ) {
+      throw new Error('Username or password not defined!');
+    }
+
     const login = new Login(page);
-    await login.login();
+    await login.login(process.env.user, process.env.pass);
     this.log('logged in!');
 
     const accountManager = new AccountManager(page);
@@ -69,6 +76,8 @@ class LuisXVI {
       });
       this.log(`finished downloading csv's for ${account.name}`);
     }
+    //remove all the entries that have no problematic periods
+    problematicPeriods = problematicPeriods.filter(e => e.periods.length > 0);
     this.log(JSON.stringify(problematicPeriods));
     // Telegram.getInstance().sendQuiet(JSON.stringify(problematicPeriods, null, 0));
     browser.close();

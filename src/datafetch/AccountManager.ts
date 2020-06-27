@@ -2,13 +2,15 @@ import { Page } from 'puppeteer';
 import Account from './Account';
 
 /**
- * In charge of getting the linked accounts available when visiting '/accounts'.
+ * In charge of going to and getting the linked accounts available at
+ * 'https://analytics.twitter.com/accounts'.
  */
 class AccountManager {
   private _page: Page;
   private _accounts: Account[] = [];
 
-  private static readonly ACCOUNT_SELECTOR: string = 'ul.AccountSelector-accounts > li';
+  private static readonly ACCOUNT_SELECTOR: string =
+    'ul.AccountSelector-accounts > li';
   private static readonly AVATAR_SELECTOR: string =
     'ul.AccountSelector-accounts > li > div > div > img';
 
@@ -17,17 +19,16 @@ class AccountManager {
   }
 
   addAccount(account: Account): void {
+    if (account === null) return;
     this._accounts.push(account);
+  }
+
+  addAccounts(accounts: Account[]): void {
+    accounts.forEach(this.addAccount);
   }
 
   get accounts(): Account[] {
     return [...this._accounts];
-  }
-
-  *accountsY(): Generator<Account> {
-    for (let account of this.accounts) {
-      yield account;
-    }
   }
 
   async goToAccounts() {
@@ -36,24 +37,37 @@ class AccountManager {
 
   async updateAccounts(): Promise<void> {
     try {
-      await this._page.waitForSelector(AccountManager.ACCOUNT_SELECTOR, { timeout: 2500 });
+      await this._page.waitForSelector(AccountManager.ACCOUNT_SELECTOR, {
+        timeout: 2500
+      });
       console.log('getting user ids');
-      const result = await this._page.$$eval(AccountManager.AVATAR_SELECTOR, (avatars) =>
-        avatars.map((avatar) => avatar.getAttribute('alt'))
+
+      const result = await this._page.$$eval(
+        AccountManager.AVATAR_SELECTOR,
+        avatars => avatars.map(avatar => avatar.getAttribute('alt'))
       );
-      for (let account of result) {
-        if (account !== null) {
-          this._accounts.push(new Account(account));
-        }
-      }
+
+      this.addAccounts(
+        result
+          .filter(r => typeof r === 'string')
+          .map(a => new Account(a as string))
+      );
     } catch (ex) {
-      if (!ex.message.includes('waiting for selector "ul.AccountSelector-accounts > li')) {
+      if (
+        !ex.message.includes(
+          'waiting for selector "ul.AccountSelector-accounts > li'
+        )
+      ) {
         throw ex;
       }
       this.useCurrentAccount();
     }
 
-    console.log(`[AccountManager] accounts: '${this._accounts.map((a) => a.name).join(', ')}'`);
+    console.log(
+      `[AccountManager] accounts: '${this._accounts
+        .map(a => a.name)
+        .join(', ')}'`
+    );
     return Promise.resolve();
   }
 

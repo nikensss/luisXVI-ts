@@ -14,15 +14,22 @@ class Human {
   private static readonly CALENDAR_DROPDOWN: string = '#daterange-button';
   private static readonly TWEETS_NAVBAR: string = '.SharedNavBar--analytics';
   private static readonly TWEETS_LINK: string = `//a[contains(text(), 'Tweets')]`;
-  private static readonly EXPORTAR_DATOS: string = '#export > button > span.ladda-label';
-  private static readonly BY_TWEET: string = '#export > ul > li:nth-child(1) > button[data-type="by_tweet"]';
-  private static readonly UPDATE: string = 'div.daterangepicker > div.ranges > div > button.applyBtn';
-  private static readonly DATE_RANGE_TITLE: string = '#daterange-button > span.daterange-selected';
+  private static readonly EXPORTAR_DATOS: string =
+    '#export > button > span.ladda-label';
+  private static readonly BY_TWEET: string =
+    '#export > ul > li:nth-child(1) > button[data-type="by_tweet"]';
+  private static readonly UPDATE: string =
+    'div.daterangepicker > div.ranges > div > button.applyBtn';
+  private static readonly CALENDAR: string = 'div.daterangepicker';
+  private static readonly DATE_RANGE_TITLE: string =
+    '#daterange-button > span.daterange-selected';
   private static readonly DATE_RANGES: string = '.ranges > ul > li';
   private static readonly CALENDAR_LEFT_PREV: string =
     '.calendar.left > .calendar-date > table > thead > tr > th.prev.available';
-  private static readonly CALENDAR_LEFT_TBODY: string = '.calendar.left > .calendar-date > table > tbody';
-  private static readonly CALENDAR_RIGHT_TBODY: string = '.calendar.right > .calendar-date > table > tbody';
+  private static readonly CALENDAR_LEFT_TBODY: string =
+    '.calendar.left > .calendar-date > table > tbody';
+  private static readonly CALENDAR_RIGHT_TBODY: string =
+    '.calendar.right > .calendar-date > table > tbody';
   private static readonly CALENDAR_RIGHT_PREV: string =
     '.calendar.right > .calendar-date > table > thead > tr > th.prev.available';
 
@@ -57,10 +64,12 @@ class Human {
    */
   async downloadCurrentMonth(): Promise<boolean> {
     while (true) {
-      await this.toggleCalendar();
+      await this.openCalendar();
       await this.selectCurrentMonth();
       if (!(await this.exportDataByTweet())) {
-        console.log(`[Human] could not download csv for period ${await this.getDateRangeTitle()}`);
+        console.log(
+          `[Human] could not download csv for period ${await this.getDateRangeTitle()}`
+        );
         await this._page.reload();
         return Promise.resolve(false);
       }
@@ -68,11 +77,31 @@ class Human {
     }
   }
 
+  async isCalendarClosed(): Promise<boolean> {
+    return await this.page.$eval(Human.CALENDAR, elem => {
+      return (
+        window.getComputedStyle(elem).getPropertyValue('display') === 'none'
+      );
+    });
+  }
+
+  async isCalendarOpen(): Promise<boolean> {
+    return !(await this.isCalendarClosed());
+  }
+
+  async openCalendar(): Promise<void> {
+    if (await this.isCalendarClosed()) this.toggleCalendar();
+  }
+
+  async closeCalendar(): Promise<void> {
+    if (await this.isCalendarOpen()) this.toggleCalendar();
+  }
+
   async downloadPreviousMonths(amount: number): Promise<string[]> {
     let problematicPeriods = [];
     let range;
     for (let i = 0; i < amount; i++) {
-      await this.toggleCalendar(); //TODO: should be 'this.openCalendar()'!
+      await this.openCalendar();
       await this.leftCalendarToPreviousMonth();
       await this.selectFirstDayOfMonth();
       await this.rightCalendarToPreviousMonth();
@@ -140,7 +169,9 @@ class Human {
 
   private async selectCurrentMonth(): Promise<void> {
     await this._page.waitForSelector(Human.DATE_RANGES);
-    return await this._page.$$eval(Human.DATE_RANGES, (elements) => (<HTMLElement>elements[2]).click());
+    return await this._page.$$eval(Human.DATE_RANGES, elements =>
+      (<HTMLElement>elements[2]).click()
+    );
   }
 
   private async leftCalendarToPreviousMonth() {
@@ -160,7 +191,7 @@ class Human {
   private async selectFirstDayOfMonth() {
     await this._page.waitForSelector(Human.CALENDAR_LEFT_TBODY);
     console.log('[Human] selecting first day of month');
-    await this._page.$eval(Human.CALENDAR_LEFT_TBODY, (element) => {
+    await this._page.$eval(Human.CALENDAR_LEFT_TBODY, element => {
       const rows = [...element.children];
       for (let row of rows) {
         let days = [...row.children];
@@ -178,7 +209,7 @@ class Human {
   private async selectLastDayOfMonth() {
     await this._page.waitForSelector(Human.CALENDAR_RIGHT_TBODY);
     console.log('[Human] selecting last day of month');
-    await this._page.$eval(Human.CALENDAR_RIGHT_TBODY, (element) => {
+    await this._page.$eval(Human.CALENDAR_RIGHT_TBODY, element => {
       const rows = [...element.children].reverse();
       let firstDayFound = false;
       for (let row of rows) {
@@ -201,10 +232,14 @@ class Human {
     //this may change according to the language of the account
     //this text is written in one of the li's inside the div.range > ul
     if (!this._last28days) {
-      await this.toggleCalendar(); //TODO: should be 'this.openCalendar()'
+      const wasClosed = await this.isCalendarClosed();
+      await this.openCalendar();
       await this._page.waitForSelector(Human.DATE_RANGES);
-      this._last28days = await this._page.$$eval(Human.DATE_RANGES, (elements) => (<HTMLElement>elements[1]).innerText);
-      await this.toggleCalendar(); //TODO: should leave the state as it was before entering
+      this._last28days = await this._page.$$eval(
+        Human.DATE_RANGES,
+        elements => (elements[1] as HTMLElement).innerText
+      );
+      if (wasClosed) await this.closeCalendar();
     }
     const dateRange = await this.getDateRangeTitle();
     return this._last28days === dateRange;
@@ -212,7 +247,10 @@ class Human {
 
   private async getDateRangeTitle() {
     await this._page.waitForSelector(Human.DATE_RANGE_TITLE);
-    return await this._page.$eval(Human.DATE_RANGE_TITLE, (e) => (<HTMLElement>e).innerText);
+    return await this._page.$eval(
+      Human.DATE_RANGE_TITLE,
+      e => (<HTMLElement>e).innerText
+    );
   }
 
   private async countDownloads() {
@@ -221,7 +259,10 @@ class Human {
   }
 
   private async waitForNewDownload(): Promise<boolean> {
-    const spinner: Ora = ora({ text: 'Waiting for new downloads', prefixText: '[Human]' }).start();
+    const spinner: Ora = ora({
+      text: 'Waiting for new downloads',
+      prefixText: '[Human]'
+    }).start();
     const timer: Timer = new Timer(Human.MAX_PATIENCE);
     let currentDownloads = this._downloads;
     timer.start();
@@ -237,7 +278,13 @@ class Human {
     return Promise.resolve(true);
   }
 
-  private async waitAndClick({ name, selector }: { name: string; selector: string }): Promise<void> {
+  private async waitAndClick({
+    name,
+    selector
+  }: {
+    name: string;
+    selector: string;
+  }): Promise<void> {
     while (true) {
       try {
         await this._page.waitForSelector(selector);
@@ -247,7 +294,9 @@ class Human {
         await wait(345);
         return Promise.resolve();
       } catch (ex) {
-        console.log(`[Human] error when waiting and clicking "${name}", trying again`);
+        console.log(
+          `[Human] error when waiting and clicking "${name}", trying again`
+        );
       }
     }
   }

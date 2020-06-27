@@ -4,6 +4,12 @@ import Telegram from './utils/Telegram';
 import PeriodAggregations from './analytics/PeriodAggregations';
 import Metric from './analytics/enums/Metric';
 import Period from './analytics/enums/Period';
+import dotenv from 'dotenv';
+
+const result = dotenv.config();
+if (result.error) {
+  throw new Error(`Error while loading .env: ${result.error}`);
+}
 
 (async () => {
   const luisXVI: LuisXVI = new LuisXVI();
