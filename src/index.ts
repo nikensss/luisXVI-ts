@@ -13,7 +13,7 @@ if (result.error) {
 
 (async () => {
   const luisXVI: LuisXVI = new LuisXVI();
-  //await luisXVI.fetchData(2);
+  //await luisXVI.fetchData(9);
 
   const metrics: Metric[] = [
     Metric.TWEETS,

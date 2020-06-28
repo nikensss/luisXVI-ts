@@ -78,11 +78,12 @@ class Human {
   }
 
   async isCalendarClosed(): Promise<boolean> {
-    return await this.page.$eval(Human.CALENDAR, elem => {
-      return (
+    await this._page.waitForSelector(Human.CALENDAR);
+    return await this.page.$eval(
+      Human.CALENDAR,
+      elem =>
         window.getComputedStyle(elem).getPropertyValue('display') === 'none'
-      );
-    });
+    );
   }
 
   async isCalendarOpen(): Promise<boolean> {
