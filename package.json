@@ -4,7 +4,8 @@
   "description": "tutorial on how to run nodejs apps with typescript and babel",
   "main": "index.js",
   "scripts": {
-    "test": "ts-node src/tests/test.ts",
+    "test-custom": "ts-node src/tests/test.ts",
+    "test": "mocha --require ts-node/register test/**/*.spec.ts",
     "watch": "tsc -w",
     "start": "ts-node src/index.ts"
   },
@@ -15,7 +16,11 @@
     "url": "git://github.com/nikensss/luisXVI-ts.git"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
     "@types/node": "^13.13.2",
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1",
     "ts-node": "^8.10.1",
     "typescript": "^3.9.2"
   },

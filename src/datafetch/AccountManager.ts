@@ -24,7 +24,8 @@ class AccountManager {
   }
 
   addAccounts(accounts: Account[]): void {
-    accounts.forEach(this.addAccount);
+    if (!Array.isArray(accounts)) return;
+    accounts.forEach(a => this.addAccount(a));
   }
 
   get accounts(): Account[] {
@@ -49,7 +50,7 @@ class AccountManager {
 
       this.addAccounts(
         result
-          .filter(r => typeof r === 'string')
+          ?.filter(r => typeof r === 'string')
           .map(a => new Account(a as string))
       );
     } catch (ex) {
@@ -73,7 +74,7 @@ class AccountManager {
 
   private useCurrentAccount(): void {
     const url = this._page.url();
-    const accountName = url.replace(/.*\/user\/(.+)\/.*/, '$1');
+    const accountName = url.replace(/.*\/user\/(.+)\/.*/, '$1'); //?
     this._accounts.push(new Account(accountName));
   }
 }
