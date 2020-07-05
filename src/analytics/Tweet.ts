@@ -34,15 +34,6 @@ class Tweet {
   private _mediaViews: number;
   private _mediaEngagements: number;
 
-  // private _promotedPermalinkClicks: number;
-  // private _promotedAppOpens: number;
-  // private _ptomotedAppInstalls: number;
-  // private _promotedFollows: number;
-  // private _promotedEmailTweet: string;
-  // private _promotedDialPhone: string;
-  // private _promotedMediaViews: number;
-  // private _promotedMediaEngagements: number;
-
   constructor(t: any) {
     this._tweet = t;
     this._id = t['Tweet id'];

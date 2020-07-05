@@ -28,10 +28,11 @@ class LuisXVI {
   }
 
   async fetchData(amount: number): Promise<void> {
-    if (amount <= 0)
+    if (amount <= 0) {
       throw new Error(
         `Given amount must be greater than 0, received: ${amount}`
       );
+    }
 
     this._downloadManager.flush();
 
@@ -94,8 +95,8 @@ class LuisXVI {
 
     const csvPaths: PathLike[] = this._downloadManager.listDownloads();
     const tweets: Tweet[] = await CsvHandler.parseMultiple(csvPaths);
-    const leonhard = new Analyzer(tweets);
-    let result: PeriodAggregations[] = leonhard.sum(metrics, periods);
+    const analyzer = new Analyzer(tweets);
+    let result: PeriodAggregations[] = analyzer.sum(metrics, periods);
 
     this.log('finished with crunching!');
     return result;

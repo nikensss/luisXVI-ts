@@ -1,13 +1,15 @@
+import Metric from './enums/Metric';
+
 class Aggregation {
-  private _name: string;
+  private _name: Metric;
   private _value: number;
 
-  constructor(name: string, value: number = 0) {
+  constructor(name: Metric, value: number = 0) {
     this._name = name;
     this._value = value;
   }
 
-  get name(): string {
+  get name(): Metric {
     return this._name;
   }
 

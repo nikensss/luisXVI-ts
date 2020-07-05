@@ -2,6 +2,7 @@ import Period from './enums/Period';
 import Tweet from './Tweet';
 import PeriodAggregations from './PeriodAggregations';
 import Aggregation from './Aggregation';
+import Metric from './enums/Metric';
 
 class PeriodTweets {
   private _period: Period;
@@ -89,11 +90,11 @@ class PeriodTweets {
    * @param callback the reduction to apply
    * @param initialValue the initial value for the reduction
    */
-  sum(metrics: string[]): PeriodAggregations {
-    if (this.data.every((t: any) => t instanceof Tweet)) {
+  sum(metrics: Metric[]): PeriodAggregations {
+    if (this.hasTweets()) {
       const aggregations: Aggregation[] = metrics.map(m => new Aggregation(m));
 
-      (<Tweet[]>this.data).reduce((t: Aggregation[], c: Tweet) => {
+      this.tweets.reduce((t: Aggregation[], c: Tweet) => {
         t.forEach(a => a.add(c.getMetric(a.name)));
         return t;
       }, aggregations);
@@ -104,7 +105,28 @@ class PeriodTweets {
     return new PeriodAggregations(
       this.period,
       this.name,
-      (<PeriodTweets[]>this.data).map((d: PeriodTweets) => d.sum(metrics))
+      this.periodTweets.map((d: PeriodTweets) => d.sum(metrics))
+    );
+  }
+
+  private get tweets(): Tweet[] {
+    if (this.hasTweets()) return this.data as Tweet[];
+
+    throw new Error('Cannot cast to Tweet[]!');
+  }
+  private get periodTweets(): PeriodTweets[] {
+    if (this.hasPeriodTweets()) return this.data as PeriodTweets[];
+
+    throw new Error('Cannot cast to PeriodTweets[]!');
+  }
+
+  private hasTweets(): boolean {
+    return this.data.every((d: PeriodTweets | Tweet) => d instanceof Tweet);
+  }
+
+  private hasPeriodTweets(): boolean {
+    return this.data.every(
+      (d: PeriodTweets | Tweet) => d instanceof PeriodTweets
     );
   }
 }

@@ -1,5 +1,6 @@
 import PeriodAggregations from '../analytics/PeriodAggregations';
 import TableColumn from './TableColumn';
+import Metric from '../analytics/enums/Metric';
 
 class TableBuilder {
   private _periods: PeriodAggregations[];
@@ -39,8 +40,8 @@ class TableBuilder {
   }
 
   private body(): string {
-    const metrics: string[] = [
-      ...new Set<string>(
+    const metrics: Metric[] = [
+      ...new Set<Metric>(
         this._periods.map(p => [...p.getAggregatedMetricNames()]).flat()
       )
     ];
@@ -52,18 +53,18 @@ class TableBuilder {
     //match because of the sorting order and the sweept order of the array, but
     //I don't feel comfortable with that...
 
-    return metrics.reduce((t: string, c: string) => {
-      //start the row for this metric
+    //TODO: getAggregatedMetric should be something like getAggregation, which
+    //should return an Aggregation object
+
+    return metrics.reduce((t: string, metric: Metric) => {
       t += '<tr>\n';
-      //add the name of this metric at the beginning of the row
-      t += `<td class='first-column metric-name'>${c}</td>`;
+      t += `<td class='first-column metric-name'>${metric}</td>`;
       //add each of the values of this metric for each disaggregated period
       t += `${this._periods
-        .map(p => p.getAggregatedMetric(c))
+        .map(p => p.getAggregatedMetric(metric))
         .flat()
         .map(n => `<td>${n}</td>`)
         .join('')}`;
-      //end the row
       t += '\n</tr>';
       return t;
     }, '');

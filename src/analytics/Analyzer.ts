@@ -3,6 +3,7 @@ import PeriodAggregations from './PeriodAggregations';
 import PeriodTweets from './PeriodTweets';
 import Period from './enums/Period';
 import Tweet from './Tweet';
+import Metric from './enums/Metric';
 
 /**
  * The Analyzer class is responsible for the mathematic
@@ -22,9 +23,12 @@ class Analyzer {
   //   return <PeriodAggregation>this.diveRate(sumPropA, sumPropB);
   // }
 
-  public sum(metrics: string[], periods: Period[]): PeriodAggregations[] {
-    const periodsTweets: PeriodTweets[] = PeriodTweets.fromAny(groupby(this._tweets, ...periods), periods);
-    return periodsTweets.map((periodTweets) => periodTweets.sum(metrics));
+  public sum(metrics: Metric[], periods: Period[]): PeriodAggregations[] {
+    const periodsTweets: PeriodTweets[] = PeriodTweets.fromAny(
+      groupby(this._tweets, ...periods),
+      periods
+    );
+    return periodsTweets.map(periodTweets => periodTweets.sum(metrics));
   }
 }
 
