@@ -25,7 +25,7 @@ if (result.error) {
     Period.YEAR,
     Period.SEMESTER,
     Period.QUARTER,
-    Period.MONTH
+    Period.MONTH_NAME
   ];
   const result: PeriodAggregations[] = await luisXVI.crunch({
     metrics,

@@ -74,7 +74,7 @@ class AccountManager {
 
   private useCurrentAccount(): void {
     const url = this._page.url();
-    const accountName = url.replace(/.*\/user\/(.+)\/.*/, '$1'); //?
+    const accountName = url.replace(/.*\/user\/(.+)\/.*/, '$1');
     this._accounts.push(new Account(accountName));
   }
 }
