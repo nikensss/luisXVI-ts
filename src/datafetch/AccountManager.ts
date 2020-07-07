@@ -59,8 +59,9 @@ class AccountManager {
           'waiting for selector "ul.AccountSelector-accounts > li'
         )
       ) {
-        throw ex;
+        return Promise.reject(ex);
       }
+
       this.useCurrentAccount();
     }
 

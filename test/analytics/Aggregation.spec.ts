@@ -13,6 +13,10 @@ describe('Aggregation tests', () => {
     expect(agg.value).to.be.equal(123);
   });
 
+  it('should not accept negative values at construction time', () => {
+    expect(() => new Aggregation(Metric.LIKES, -1)).to.throw('Invalid value');
+  });
+
   it('should get metric Metric.LIKES', () => {
     const agg = new Aggregation(Metric.LIKES);
     expect(agg.name).to.be.equal(Metric.LIKES);
@@ -22,5 +26,10 @@ describe('Aggregation tests', () => {
     const agg = new Aggregation(Metric.LIKES, 123);
     agg.add(123);
     expect(agg.value).to.be.equal(246);
+  });
+
+  it('should not accept negative added value', () => {
+    const agg = new Aggregation(Metric.LIKES);
+    expect(() => agg.add(-1)).to.throw('n must be 0 or positive');
   });
 });

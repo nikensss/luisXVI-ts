@@ -1,11 +1,13 @@
 import AccountManager from '../../src/datafetch/AccountManager';
 import { Page } from 'puppeteer';
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
 import Account from '../../src/datafetch/Account';
-import { fail } from 'assert';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('AccountManager', () => {
-  it('creates new AccountManager', () => {
+  it('creates a new AccountManager', () => {
     const mockPage: unknown = {};
     const accountManager = new AccountManager(mockPage as Page);
     expect(accountManager).to.not.be.undefined;
@@ -25,6 +27,7 @@ describe('AccountManager', () => {
     const mockPage: unknown = {};
     const accountManager = new AccountManager(mockPage as Page);
     accountManager.addAccount(null!);
+
     expect(accountManager.accounts.length).to.be.equal(0);
   });
 
@@ -33,6 +36,7 @@ describe('AccountManager', () => {
     const account = new Account('test');
     const accountManager = new AccountManager(mockPage as Page);
     accountManager.addAccount(account);
+
     expect(accountManager.accounts.length).to.be.equal(1);
   });
 
@@ -41,6 +45,7 @@ describe('AccountManager', () => {
     const account = new Account('test');
     const accountManager = new AccountManager(mockPage as Page);
     accountManager.addAccount(account);
+
     expect(accountManager.accounts.pop()?.name).to.be.equal('test');
   });
 
@@ -63,7 +68,11 @@ describe('AccountManager', () => {
     };
     const accountManager = new AccountManager(mockPage as Page);
     await accountManager.updateAccounts();
-    expect(accountManager.accounts.length).to.be.equal(2);
+
+    expect(accountManager.accounts).to.deep.equal([
+      new Account('test1'),
+      new Account('test2')
+    ]);
   });
 
   it('"updates" accounts without available accounts', async () => {
@@ -77,6 +86,7 @@ describe('AccountManager', () => {
     };
     const accountManager = new AccountManager(mockPage as Page);
     await accountManager.updateAccounts();
+
     expect(accountManager.accounts.length).to.be.equal(0);
   });
 
@@ -93,21 +103,21 @@ describe('AccountManager', () => {
     };
     const accountManager = new AccountManager(mockPage as Page);
     await accountManager.updateAccounts();
+
     expect(accountManager.accounts.pop()?.name).to.be.equal('MrPiglover');
   });
 
   it('throws ex when unknown ex occurs in updateAccoutns', async () => {
     const mockPage: unknown = {
       waitForSelector: async (selector: string) => {
-        throw new Error('unknown exception');
+        return Promise.reject(new Error('unknown error'));
       }
     };
+
     const accountManager = new AccountManager(mockPage as Page);
-    try {
-      await accountManager.updateAccounts();
-      fail();
-    } catch (ex) {
-      expect(ex.toString()).to.be.equal('Error: unknown exception');
-    }
+
+    await expect(accountManager.updateAccounts()).to.be.rejectedWith(
+      'unknown error'
+    );
   });
 });

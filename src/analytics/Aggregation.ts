@@ -5,6 +5,8 @@ class Aggregation {
   private _value: number;
 
   constructor(name: Metric, value: number = 0) {
+    if (value < 0) throw new Error('Invalid value');
+
     this._name = name;
     this._value = value;
   }
@@ -18,6 +20,9 @@ class Aggregation {
   }
 
   add(n: number): void {
+    if (n < 0) {
+      throw new Error('Invalid argument exception: n must be 0 or positive');
+    }
     this._value += n;
   }
 }
